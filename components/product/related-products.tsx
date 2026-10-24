@@ -6,6 +6,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { MinusSignIcon, PlusSignIcon } from "@hugeicons/core-free-icons";
+import { AnimateNumber } from "@/components/ui/animate-number";
+import { motion, type Variants } from "motion/react";
+
+const shimmerVariants: Variants = {
+  initial: { x: "-150%", skewX: -20 },
+  hover: {
+    x: "250%",
+    transition: { duration: 0.75, ease: "easeInOut" },
+  },
+};
 
 interface Product {
   id: string;
@@ -113,7 +123,7 @@ export function RelatedProducts() {
                     </Button>
 
                     <span className="min-w-6 text-center text-xs font-semibold text-gray-800">
-                      {qty}
+                      <AnimateNumber>{qty}</AnimateNumber>
                     </span>
 
                     <Button
@@ -132,15 +142,28 @@ export function RelatedProducts() {
                     </Button>
                   </div>
 
-                  <Button
-                    size="sm"
-                    className="h-7 flex-1 bg-blue-950 text-xs font-semibold text-white hover:bg-blue-900"
-                    onClick={() => {
-                      alert(`Added ${qty} case(s) of ${product.name} to cart!`);
-                    }}
+                  <motion.div
+                    initial="initial"
+                    whileHover="hover"
+                    className="relative flex-1 overflow-hidden rounded-md"
                   >
-                    Add
-                  </Button>
+                    {/* Shimmer light sweep beam */}
+                    <motion.div
+                      aria-hidden="true"
+                      variants={shimmerVariants}
+                      className="pointer-events-none absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/20 to-transparent z-10"
+                    />
+
+                    <Button
+                      size="sm"
+                      className="h-7 w-full bg-blue-950 text-xs font-semibold text-white hover:bg-blue-900"
+                      onClick={() => {
+                        alert(`Added ${qty} case(s) of ${product.name} to cart!`);
+                      }}
+                    >
+                      Add
+                    </Button>
+                  </motion.div>
                 </div>
               </CardContent>
             </Card>

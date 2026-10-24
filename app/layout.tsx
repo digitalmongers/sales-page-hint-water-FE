@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono, Inter, Noto_Sans } from "next/font/google"
+import { Geist_Mono, Inter, Noto_Sans } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -13,6 +13,8 @@ const fontMono = Geist_Mono({
   variable: "--font-mono",
 })
 
+import { Toaster } from "@/components/ui/sonner";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -26,6 +28,7 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>{children}</ThemeProvider>
+        <Toaster position="bottom-left" />
       </body>
     </html>
   )

@@ -3,6 +3,10 @@
 import { ProductDetails } from "@/components/product/product-details";
 import Image from "next/image";
 import { RelatedProducts } from "@/components/product/related-products";
+import { FAQSection } from "@/components/product/faq-section";
+import { ReviewSection } from "@/components/product/review-section";
+import { NutritionSection } from "@/components/product/nutrition-section";
+import { Footer } from "@/components/layout/footer";
 
 export default function Page() {
   return (
@@ -58,6 +62,12 @@ export default function Page() {
         </div>
       </section>
       <RelatedProducts />
+      <NutritionSection />
+      <ReviewSection />
+      <FAQSection />
+      <Footer />
+
+
     </main>
   );
 }
