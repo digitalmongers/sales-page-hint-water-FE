@@ -322,3 +322,13 @@ After each development task, provide a concise report containing:
 - Treat documentation as a maintained part of the source code.
 
 **Final instruction:** Begin by auditing the current repository and creating or updating the documentation system. After the initial audit, maintain it automatically during every subsequent development task. Before finishing each task, verify that all materially affected documentation has been updated.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

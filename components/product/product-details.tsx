@@ -197,23 +197,31 @@ export function ProductDetails() {
             </div>
 
             <div className="mt-8">
-                <h2 className="mb-3 font-bold">Choose your flavor</h2>
+                <h2 className="mb-3 font-bold text-gray-900 dark:text-gray-100">Choose your flavor</h2>
 
                 <div className="flex flex-wrap gap-2">
-                    {flavors.map((item) => (
-                        <Button
-                            size="sm"
-                            key={item.id}
-                            variant={selectedFlavor === item.id ? "default" : "outline"}
-                            onClick={() => setSelectedFlavor(item.id)}
-                        >
-                            {item.name}
-                        </Button>
-                    ))}
+                    {flavors.map((item) => {
+                        const isSelected = selectedFlavor === item.id;
+                        return (
+                            <Button
+                                size="sm"
+                                key={item.id}
+                                variant={isSelected ? "default" : "outline"}
+                                className={
+                                    isSelected
+                                        ? "bg-blue-950 text-white border-blue-950 hover:bg-blue-900 shadow-xs font-semibold"
+                                        : "border-gray-300 bg-white text-gray-800 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-800"
+                                }
+                                onClick={() => setSelectedFlavor(item.id)}
+                            >
+                                {item.name}
+                            </Button>
+                        );
+                    })}
                 </div>
 
                 <div className="mt-8">
-                    <h2 className="mb-3 font-bold">Purchase options</h2>
+                    <h2 className="mb-3 font-bold text-gray-900 dark:text-gray-100">Purchase options</h2>
 
                     <RadioGroup
                         value={purchaseType}
@@ -298,7 +306,7 @@ export function ProductDetails() {
 
 
                     <div className="mt-8">
-                        <h2 className="mb-3 font-semibold">Quantity</h2>
+                        <h2 className="mb-3 font-semibold text-gray-900 dark:text-gray-100">Quantity</h2>
 
                         <div className="flex items-center gap-4">
                             <div className="flex items-center rounded-lg border">
