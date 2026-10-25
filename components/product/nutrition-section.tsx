@@ -31,7 +31,7 @@ export function NutritionSection() {
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           preserveAspectRatio="none"
-          className="block h-10 w-full text-white sm:h-16 md:h-20 lg:h-24"
+          className="block h-10 w-full text-white dark:text-background sm:h-16 md:h-20 lg:h-24"
         >
           {/* Subtle semi-transparent wave layer */}
           <path
@@ -68,7 +68,7 @@ export function NutritionSection() {
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           preserveAspectRatio="none"
-          className="block h-10 w-full text-white sm:h-16 md:h-20 lg:h-24"
+          className="block h-10 w-full text-white dark:text-background sm:h-16 md:h-20 lg:h-24"
         >
           {/* Subtle semi-transparent wave layer */}
           <path
@@ -132,16 +132,16 @@ export function NutritionSection() {
             </div>
           </div>
 
-          <div className="rounded-xl bg-white p-5 text-slate-900 sm:p-7">
-            <h3 className="border-b-4 border-slate-900 pb-3 text-2xl font-extrabold">
+          <div className="rounded-xl bg-white dark:bg-card p-5 text-slate-900 dark:text-card-foreground border border-transparent dark:border-gray-800 sm:p-7 shadow-sm">
+            <h3 className="border-b-4 border-slate-900 dark:border-slate-100 pb-3 text-2xl font-extrabold">
               Nutrition Facts
             </h3>
 
-            <p className="border-b border-slate-300 py-2 text-sm">
+            <p className="border-b border-slate-300 dark:border-slate-700 py-2 text-sm">
               Serving Size: 1 bottle (473 mL)
             </p>
 
-            <div className="border-b-4 border-slate-900 py-3">
+            <div className="border-b-4 border-slate-900 dark:border-slate-100 py-3">
               <p className="text-xs font-semibold">Amount per serving</p>
               <div className="mt-1 flex items-center justify-between">
                 <span className="text-xl font-bold">Calories</span>
@@ -149,21 +149,21 @@ export function NutritionSection() {
               </div>
             </div>
 
-            <p className="border-b border-slate-300 py-2 text-right text-xs font-semibold">
+            <p className="border-b border-slate-300 dark:border-slate-700 py-2 text-right text-xs font-semibold">
               % Daily Value*
             </p>
 
             {nutritionFacts.slice(2).map((fact) => (
               <div
                 key={fact.label}
-                className="flex justify-between gap-4 border-b border-slate-200 py-2 text-sm"
+                className="flex justify-between gap-4 border-b border-slate-200 dark:border-slate-800 py-2 text-sm"
               >
                 <span>{fact.label}</span>
                 <span className="font-semibold">{fact.value}</span>
               </div>
             ))}
 
-            <p className="mt-4 text-xs leading-5 text-slate-600">
+            <p className="mt-4 text-xs leading-5 text-slate-600 dark:text-slate-400">
               *Daily Values are based on a 2,000 calorie diet.
               Nutrition information should be verified against the
               actual product label before publishing.

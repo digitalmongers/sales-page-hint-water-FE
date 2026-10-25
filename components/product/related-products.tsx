@@ -8,6 +8,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { MinusSignIcon, PlusSignIcon } from "@hugeicons/core-free-icons";
 import { AnimateNumber } from "@/components/ui/animate-number";
 import { motion, type Variants } from "motion/react";
+import { useCart } from "@/hooks/use-cart";
 
 const shimmerVariants: Variants = {
   initial: { x: "-150%", skewX: -20 },
@@ -54,13 +55,14 @@ const products: Product[] = [
 ];
 
 export function RelatedProducts() {
+  const { addToCart } = useCart();
   const [quantities, setQuantities] = useState<Record<string, number>>(
     Object.fromEntries(products.map((product) => [product.id, 1]))
   );
 
   return (
     <section className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6">
-      <h2 className="mb-8 text-center text-2xl font-bold text-blue-950">
+      <h2 className="mb-8 text-center text-2xl font-bold text-blue-950 dark:text-white">
         You May Also Like
       </h2>
 
@@ -71,9 +73,9 @@ export function RelatedProducts() {
           return (
             <Card
               key={product.id}
-              className="group min-w-0 overflow-hidden rounded-xl border border-gray-100 bg-white gap-0 py-0 shadow-sm transition-all duration-200 hover:shadow-md"
+              className="group min-w-0 overflow-hidden rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-card gap-0 py-0 shadow-sm transition-all duration-200 hover:shadow-md dark:hover:border-gray-700"
             >
-              <div className="relative flex aspect-square items-center justify-center bg-gray-50">
+              <div className="relative flex aspect-square items-center justify-center bg-gray-50 dark:bg-gray-900/60">
                 <Image
                   src={product.image}
                   alt={`${product.name} Hint Water`}
@@ -83,7 +85,7 @@ export function RelatedProducts() {
                 />
 
                 {product.isNew && (
-                  <span className="absolute left-3 top-3 rounded-full bg-blue-950 px-2.5 py-0.5 text-xs font-semibold text-white shadow-xs">
+                  <span className="absolute left-3 top-3 rounded-full bg-blue-950 dark:bg-blue-600 px-2.5 py-0.5 text-xs font-semibold text-white shadow-xs">
                     NEW
                   </span>
                 )}
@@ -91,25 +93,25 @@ export function RelatedProducts() {
 
               <CardContent className="p-3 md:p-4">
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-sm font-semibold capitalize text-blue-950">
+                  <h3 className="text-sm font-semibold capitalize text-blue-950 dark:text-white">
                     {product.name}
                   </h3>
 
-                  <span className="shrink-0 text-sm font-bold text-blue-950">
+                  <span className="shrink-0 text-sm font-bold text-blue-950 dark:text-blue-400">
                     ${product.price.toFixed(2)}
                   </span>
                 </div>
 
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   1 case of 12 bottles
                 </p>
 
                 <div className="mt-3 flex items-center gap-2">
-                  <div className="flex items-center rounded-md border border-gray-200 bg-white">
+                  <div className="flex items-center rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                     <Button
                       size="icon-xs"
                       variant="ghost"
-                      className="h-7 w-7 text-gray-600 hover:text-blue-950"
+                      className="h-7 w-7 text-gray-600 dark:text-gray-300 hover:text-blue-950 dark:hover:text-white"
                       onClick={() =>
                         setQuantities((current) => ({
                           ...current,
@@ -122,14 +124,14 @@ export function RelatedProducts() {
                       <HugeiconsIcon icon={MinusSignIcon} className="size-3.5" />
                     </Button>
 
-                    <span className="min-w-6 text-center text-xs font-semibold text-gray-800">
+                    <span className="min-w-6 text-center text-xs font-semibold text-gray-800 dark:text-white">
                       <AnimateNumber>{qty}</AnimateNumber>
                     </span>
 
                     <Button
                       size="icon-xs"
                       variant="ghost"
-                      className="h-7 w-7 text-gray-600 hover:text-blue-950"
+                      className="h-7 w-7 text-gray-600 dark:text-gray-300 hover:text-blue-950 dark:hover:text-white"
                       onClick={() =>
                         setQuantities((current) => ({
                           ...current,
@@ -155,10 +157,18 @@ export function RelatedProducts() {
                     />
 
                     <Button
+                      id={`related-add-${product.id}`}
                       size="sm"
-                      className="h-7 w-full bg-blue-950 text-xs font-semibold text-white hover:bg-blue-900"
+                      className="h-7 w-full bg-blue-950 dark:bg-blue-600 text-xs font-semibold text-white hover:bg-blue-900 dark:hover:bg-blue-500 cursor-pointer"
                       onClick={() => {
-                        alert(`Added ${qty} case(s) of ${product.name} to cart!`);
+                        addToCart({
+                          id: `related-${product.id}`,
+                          name: `${product.name} Hint Water`,
+                          flavor: `${product.name} (12-pack)`,
+                          price: product.price,
+                          quantity: qty,
+                          image: product.image,
+                        });
                       }}
                     >
                       Add

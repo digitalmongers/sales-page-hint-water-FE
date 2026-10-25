@@ -15,6 +15,7 @@ const fontMono = Geist_Mono({
 
 import { Toaster } from "@/components/ui/sonner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { CartProvider } from "@/hooks/use-cart";
 
 export default function RootLayout({
   children,
@@ -28,7 +29,9 @@ export default function RootLayout({
       className={cn("antialiased", fontMono.variable, "font-sans", inter.variable, notoSansHeading.variable)}
     >
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <CartProvider>{children}</CartProvider>
+        </ThemeProvider>
         <Toaster position="bottom-left" />
         <SpeedInsights />
       </body>

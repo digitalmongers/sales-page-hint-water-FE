@@ -28,35 +28,16 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 
-export interface CartItem {
-  id: string;
-  name: string;
-  flavor: string;
-  price: number;
-  quantity: number;
-  image: string;
-  isSubscription?: boolean;
-}
+import { useCart, type CartItem } from "@/hooks/use-cart";
+export type { CartItem };
 
 interface CartDrawerProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   items?: CartItem[];
   onUpdateQuantity?: (id: string, delta: number) => void;
   onRemoveItem?: (id: string) => void;
 }
-
-const DEFAULT_ITEMS: CartItem[] = [
-  {
-    id: "item-1",
-    name: "Peach Raspberry Hint® Water",
-    flavor: "Peach Raspberry (12-pack)",
-    price: 22.99,
-    quantity: 1,
-    image: "/images/peachRaspberry.svg",
-    isSubscription: false,
-  },
-];
 
 const FREE_SHIPPING_THRESHOLD = 40.0;
 
@@ -64,32 +45,19 @@ export function CartDrawer({
   open,
   onOpenChange,
   items: externalItems,
-}: CartDrawerProps) {
-  const [internalItems, setInternalItems] = useState<CartItem[]>(DEFAULT_ITEMS);
+  onUpdateQuantity: externalUpdateQty,
+  onRemoveItem: externalRemoveItem,
+}: CartDrawerProps = {}) {
+  const cartContext = useCart();
+  const isOpen = open !== undefined ? open : cartContext.isCartOpen;
+  const setOpen = onOpenChange !== undefined ? onOpenChange : cartContext.setIsCartOpen;
+  const cartItems = externalItems ?? cartContext.cartItems;
+  const updateQuantity = externalUpdateQty ?? cartContext.updateQuantity;
+  const removeItem = externalRemoveItem ?? cartContext.removeItem;
+
   const [promoCode, setPromoCode] = useState("");
   const [discountPercent, setDiscountPercent] = useState(0);
   const [isApplyingPromo, setIsApplyingPromo] = useState(false);
-
-  const cartItems = externalItems ?? internalItems;
-
-  const updateQuantity = (id: string, delta: number) => {
-    setInternalItems((prev) =>
-      prev
-        .map((item) => {
-          if (item.id === id) {
-            const nextQty = item.quantity + delta;
-            return nextQty > 0 ? { ...item, quantity: nextQty } : null;
-          }
-          return item;
-        })
-        .filter((item): item is CartItem => item !== null)
-    );
-  };
-
-  const removeItem = (id: string) => {
-    setInternalItems((prev) => prev.filter((item) => item.id !== id));
-    toast.info("Item removed from cart");
-  };
 
   const handleApplyPromo = (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,25 +93,24 @@ export function CartDrawer({
   const totalItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleCheckout = () => {
-    toast.success("Proceeding to secure checkout!");
-    onOpenChange(false);
+    cartContext.triggerCartCheckout();
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={isOpen} onOpenChange={setOpen}>
       <SheetContent
         side="right"
-        className="w-full sm:max-w-md p-0 flex flex-col h-full bg-white border-l border-gray-100"
+        className="w-full sm:max-w-md p-0 flex flex-col h-full bg-white dark:bg-card border-l border-gray-100 dark:border-gray-800 text-foreground"
       >
         {/* Header */}
-        <SheetHeader className="p-5 pb-3 border-b border-gray-100 bg-white">
+        <SheetHeader className="p-5 pb-3 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-card">
           <div className="flex items-center gap-2">
-            <HugeiconsIcon icon={ShoppingBag01Icon} className="size-5 text-blue-950" />
-            <SheetTitle className="text-xl font-bold text-blue-950">
+            <HugeiconsIcon icon={ShoppingBag01Icon} className="size-5 text-blue-950 dark:text-white" />
+            <SheetTitle className="text-xl font-bold text-blue-950 dark:text-white">
               Your Cart ({totalItemCount})
             </SheetTitle>
           </div>
-          <SheetDescription className="text-xs text-gray-500">
+          <SheetDescription className="text-xs text-gray-500 dark:text-gray-400">
             {totalItemCount > 0
               ? "Review your items and proceed to checkout."
               : "Your cart is currently empty."}
@@ -151,21 +118,21 @@ export function CartDrawer({
 
           {/* Free shipping milestone bar */}
           {totalItemCount > 0 && (
-            <div className="mt-2 rounded-lg bg-sky-50/70 p-3 border border-sky-100">
-              <div className="flex items-center justify-between text-xs font-semibold text-blue-950 mb-1.5">
+            <div className="mt-2 rounded-lg bg-sky-50/70 dark:bg-sky-950/40 p-3 border border-sky-100 dark:border-sky-900">
+              <div className="flex items-center justify-between text-xs font-semibold text-blue-950 dark:text-white mb-1.5">
                 <span className="flex items-center gap-1.5">
-                  <HugeiconsIcon icon={DeliveryBox01Icon} className="size-4 text-sky-600" />
+                  <HugeiconsIcon icon={DeliveryBox01Icon} className="size-4 text-sky-600 dark:text-sky-400" />
                   {isFreeShipping ? (
-                    <span className="text-emerald-700">You unlocked FREE Standard Shipping! 🎉</span>
+                    <span className="text-emerald-700 dark:text-emerald-400">You unlocked FREE Standard Shipping! 🎉</span>
                   ) : (
                     <span>
-                      Add <span className="font-bold text-sky-700">${amountToFreeShipping.toFixed(2)}</span> more for Free Shipping
+                      Add <span className="font-bold text-sky-700 dark:text-sky-400">${amountToFreeShipping.toFixed(2)}</span> more for Free Shipping
                     </span>
                   )}
                 </span>
-                <span className="text-[11px] text-gray-500">{shippingProgress}%</span>
+                <span className="text-[11px] text-gray-500 dark:text-gray-400">{shippingProgress}%</span>
               </div>
-              <Progress value={shippingProgress} className="h-1.5 bg-sky-100" />
+              <Progress value={shippingProgress} className="h-1.5 bg-sky-100 dark:bg-sky-950" />
             </div>
           )}
         </SheetHeader>
@@ -174,17 +141,17 @@ export function CartDrawer({
         <div className="flex-1 overflow-y-auto px-5 py-4">
           {cartItems.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center py-16 px-4">
-              <div className="flex size-16 items-center justify-center rounded-full bg-sky-50 text-sky-700 mb-4">
+              <div className="flex size-16 items-center justify-center rounded-full bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-400 mb-4">
                 <HugeiconsIcon icon={ShoppingBag01Icon} className="size-8" />
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-1">Your cart is empty</h3>
-              <p className="text-sm text-gray-500 max-w-xs mb-6">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Your cart is empty</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs mb-6">
                 Looks like you haven&apos;t added any delicious Hint Water flavors yet.
               </p>
               <Button
                 variant="default"
-                onClick={() => onOpenChange(false)}
-                className="bg-blue-950 hover:bg-blue-900 text-white font-medium"
+                onClick={() => setOpen(false)}
+                className="bg-blue-950 dark:bg-blue-600 hover:bg-blue-900 dark:hover:bg-blue-500 text-white font-medium cursor-pointer"
               >
                 Shop Popular Flavors
               </Button>
@@ -194,10 +161,10 @@ export function CartDrawer({
               {cartItems.map((item) => (
                 <div
                   key={item.id}
-                  className="flex gap-4 rounded-xl border border-gray-100 p-3.5 bg-gray-50/50 hover:bg-gray-50 transition-colors"
+                  className="flex gap-4 rounded-xl border border-gray-100 dark:border-gray-800 p-3.5 bg-gray-50/50 dark:bg-gray-900/50 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
                 >
                   {/* Thumbnail */}
-                  <div className="relative size-20 shrink-0 rounded-lg bg-white p-1.5 border border-gray-100 flex items-center justify-center overflow-hidden">
+                  <div className="relative size-20 shrink-0 rounded-lg bg-white dark:bg-gray-800 p-1.5 border border-gray-100 dark:border-gray-700 flex items-center justify-center overflow-hidden">
                     <Image
                       src={item.image}
                       alt={item.name}
@@ -211,17 +178,17 @@ export function CartDrawer({
                   <div className="flex flex-1 flex-col justify-between min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <h4 className="text-sm font-bold text-gray-900 truncate">
+                        <h4 className="text-sm font-bold text-gray-900 dark:text-white truncate">
                           {item.name}
                         </h4>
-                        <p className="text-xs text-gray-500 truncate mt-0.5">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
                           {item.flavor}
                         </p>
                       </div>
                       <button
                         type="button"
                         onClick={() => removeItem(item.id)}
-                        className="text-gray-400 hover:text-rose-600 transition-colors p-1"
+                        className="text-gray-400 hover:text-rose-600 transition-colors p-1 cursor-pointer"
                         aria-label="Remove item"
                       >
                         <HugeiconsIcon icon={Delete02Icon} className="size-4" />
@@ -230,22 +197,22 @@ export function CartDrawer({
 
                     <div className="flex items-center justify-between mt-3">
                       {/* Quantity buttons */}
-                      <div className="flex items-center rounded-lg border border-gray-200 bg-white shadow-xs">
+                      <div className="flex items-center rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xs">
                         <button
                           type="button"
                           onClick={() => updateQuantity(item.id, -1)}
-                          className="flex size-7 items-center justify-center text-gray-600 hover:text-blue-950 transition-colors"
+                          className="flex size-7 items-center justify-center text-gray-600 dark:text-gray-300 hover:text-blue-950 dark:hover:text-white transition-colors cursor-pointer"
                           aria-label="Decrease quantity"
                         >
                           <HugeiconsIcon icon={MinusSignIcon} className="size-3.5" />
                         </button>
-                        <span className="w-8 text-center text-xs font-semibold text-gray-900">
+                        <span className="w-8 text-center text-xs font-semibold text-gray-900 dark:text-white">
                           {item.quantity}
                         </span>
                         <button
                           type="button"
                           onClick={() => updateQuantity(item.id, 1)}
-                          className="flex size-7 items-center justify-center text-gray-600 hover:text-blue-950 transition-colors"
+                          className="flex size-7 items-center justify-center text-gray-600 dark:text-gray-300 hover:text-blue-950 dark:hover:text-white transition-colors cursor-pointer"
                           aria-label="Increase quantity"
                         >
                           <HugeiconsIcon icon={PlusSignIcon} className="size-3.5" />
@@ -253,7 +220,7 @@ export function CartDrawer({
                       </div>
 
                       {/* Price */}
-                      <span className="text-sm font-bold text-blue-950">
+                      <span className="text-sm font-bold text-blue-950 dark:text-blue-400">
                         ${(item.price * item.quantity).toFixed(2)}
                       </span>
                     </div>
@@ -266,7 +233,7 @@ export function CartDrawer({
 
         {/* Footer with totals and checkout */}
         {cartItems.length > 0 && (
-          <SheetFooter className="p-5 border-t border-gray-100 bg-white flex flex-col gap-3.5">
+          <SheetFooter className="p-5 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-card flex flex-col gap-3.5">
             {/* Promo code input */}
             <form onSubmit={handleApplyPromo} className="flex gap-2">
               <div className="relative flex-1">
@@ -286,7 +253,7 @@ export function CartDrawer({
                 variant="outline"
                 size="sm"
                 disabled={isApplyingPromo || !promoCode.trim()}
-                className="h-10 text-xs px-3 font-semibold border-gray-200 text-gray-700 hover:text-blue-950"
+                className="h-10 text-xs px-3 font-semibold border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:text-blue-950 dark:hover:text-white dark:hover:bg-gray-800 cursor-pointer"
               >
                 {isApplyingPromo ? "Applying..." : "Apply"}
               </Button>
@@ -295,13 +262,13 @@ export function CartDrawer({
             <Separator />
 
             {/* Calculations breakdown */}
-            <div className="space-y-1.5 text-xs text-gray-600">
+            <div className="space-y-1.5 text-xs text-gray-600 dark:text-gray-400">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span className="font-semibold text-gray-900">${rawSubtotal.toFixed(2)}</span>
+                <span className="font-semibold text-gray-900 dark:text-white">${rawSubtotal.toFixed(2)}</span>
               </div>
               {discountPercent > 0 && (
-                <div className="flex justify-between text-emerald-700">
+                <div className="flex justify-between text-emerald-700 dark:text-emerald-400">
                   <span>Discount ({discountPercent}%)</span>
                   <span>-${discountAmount.toFixed(2)}</span>
                 </div>
@@ -310,13 +277,13 @@ export function CartDrawer({
                 <span>Shipping</span>
                 <span>
                   {isFreeShipping ? (
-                    <span className="font-semibold text-emerald-700">FREE</span>
+                    <span className="font-semibold text-emerald-700 dark:text-emerald-400">FREE</span>
                   ) : (
                     `$${shippingCost.toFixed(2)}`
                   )}
                 </span>
               </div>
-              <div className="flex justify-between text-sm font-bold text-blue-950 pt-2 border-t border-gray-100">
+              <div className="flex justify-between text-sm font-bold text-blue-950 dark:text-white pt-2 border-t border-gray-100 dark:border-gray-800">
                 <span>Estimated Total</span>
                 <span>${total.toFixed(2)}</span>
               </div>
@@ -326,7 +293,7 @@ export function CartDrawer({
             <Button
               size="lg"
               onClick={handleCheckout}
-              className="w-full h-12 bg-blue-950 hover:bg-blue-900 text-white font-bold text-sm shadow-md gap-2"
+              className="w-full h-12 bg-blue-950 dark:bg-blue-600 hover:bg-blue-900 dark:hover:bg-blue-500 text-white font-bold text-sm shadow-md gap-2 cursor-pointer"
             >
               <span>Checkout</span>
               <span>•</span>
@@ -335,8 +302,8 @@ export function CartDrawer({
             </Button>
 
             {/* Trust badge */}
-            <div className="flex items-center justify-center gap-1.5 text-[11px] text-gray-500">
-              <HugeiconsIcon icon={SecurityCheckIcon} className="size-3.5 text-emerald-600" />
+            <div className="flex items-center justify-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-400">
+              <HugeiconsIcon icon={SecurityCheckIcon} className="size-3.5 text-emerald-600 dark:text-emerald-400" />
               <span>Guaranteed safe and secure checkout</span>
             </div>
           </SheetFooter>

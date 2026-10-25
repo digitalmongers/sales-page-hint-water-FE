@@ -19,6 +19,7 @@ import { AnimateNumber } from "@/components/ui/animate-number";
 import { ScrambleText } from "@/components/ui/scramble-text";
 import { toast } from "@/components/ui/sonner";
 import { motion, type Variants } from "motion/react";
+import { useCart } from "@/hooks/use-cart";
 
 const dummyReviewers = [
     { name: "Sarah M.", location: "Austin, TX", stars: 5, comment: "Love the fresh peach raspberry taste!" },
@@ -71,20 +72,33 @@ const shimmerVariants: Variants = {
     },
 };
 
+export interface ProductDetailsProps {
+    selectedFlavor?: string;
+    onSelectFlavor?: (id: string) => void;
+}
 
-
-export function ProductDetails() {
+export function ProductDetails({
+    selectedFlavor: selectedFlavorProp,
+    onSelectFlavor,
+}: ProductDetailsProps = {}) {
+    const { addToCart, triggerBuyNow } = useCart();
 
     const flavors = [
-        { id: "peach-raspberry", name: "Raspberry" },
-        { id: "watermelon", name: "Watermelon" },
-        { id: "black-berry", name: "Black Berry" },
-        { id: "coconut", name: "Coconut" },
-        { id: "pineapple", name: "Pineapple" },
-
+        { id: "peach-raspberry", name: "Raspberry", image: "/images/peachRaspberry.svg" },
+        { id: "watermelon", name: "Watermelon", image: "/images/watermelon.webp" },
+        { id: "black-berry", name: "Black Berry", image: "/images/blackberry.webp" },
+        { id: "coconut", name: "Coconut", image: "/images/coconut.webp" },
+        { id: "pineapple", name: "Pineapple", image: "/images/pineapple.webp" },
     ];
 
-    const [selectedFlavor, setSelectedFlavor] = useState(flavors[0].id);
+    const [internalFlavor, setInternalFlavor] = useState(flavors[0].id);
+    const selectedFlavor = selectedFlavorProp ?? internalFlavor;
+
+    const handleFlavorSelect = (id: string) => {
+        setInternalFlavor(id);
+        onSelectFlavor?.(id);
+    };
+
     const [purchaseType, setPurchaseType] = useState("one-time");
     const [quantity, setQuantity] = useState(1);
     const price = purchaseType === "subscribe" ? 18.99 : 22.99;
@@ -95,6 +109,36 @@ export function ProductDetails() {
     const totalPrice = (price * quantity).toFixed(2);
     const [deliveryFrequency, setDeliveryFrequency] = useState("30");
     const [reviewCount, setReviewCount] = useState(6729);
+
+    const handleAddToCart = () => {
+        const currentFlavor = flavors.find((item) => item.id === selectedFlavor);
+        addToCart({
+            id: `hint-${selectedFlavor}-${purchaseType}`,
+            name: `${productTitle} Hint Water`,
+            flavor: `${productTitle} (12-pack)${
+                purchaseType === "subscribe" ? ` • Delivery every ${deliveryFrequency || "30"} days` : ""
+            }`,
+            price,
+            quantity,
+            image: currentFlavor?.image || "/images/peachRaspberry.svg",
+            isSubscription: purchaseType === "subscribe",
+        });
+    };
+
+    const handleBuyNow = () => {
+        const currentFlavor = flavors.find((item) => item.id === selectedFlavor);
+        triggerBuyNow({
+            id: `hint-${selectedFlavor}-${purchaseType}`,
+            name: `${productTitle} Hint Water`,
+            flavor: `${productTitle} (12-pack)${
+                purchaseType === "subscribe" ? ` • Delivery every ${deliveryFrequency || "30"} days` : ""
+            }`,
+            price,
+            quantity,
+            image: currentFlavor?.image || "/images/peachRaspberry.svg",
+            isSubscription: purchaseType === "subscribe",
+        });
+    };
 
     const lastReviewerIndexRef = useRef(-1);
 
@@ -120,13 +164,13 @@ export function ProductDetails() {
 
             toast.custom(
                 () => (
-                    <div className="flex w-full items-start gap-3 rounded-xl border border-gray-100 bg-white p-3.5 shadow-lg">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-950 font-bold text-xs text-white">
+                    <div className="flex w-full items-start gap-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-card p-3.5 shadow-lg">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-950 dark:bg-blue-600 font-bold text-xs text-white">
                             {reviewer.name.slice(0, 1)}
                         </div>
                         <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between gap-2">
-                                <p className="truncate text-xs font-semibold text-gray-900">
+                                <p className="truncate text-xs font-semibold text-gray-900 dark:text-white">
                                     {reviewer.name}
                                 </p>
                                 <span className="text-[10px] text-gray-400">{reviewer.location}</span>
@@ -134,11 +178,11 @@ export function ProductDetails() {
                             <div className="my-0.5 flex text-xs text-amber-400">
                                 {"★".repeat(reviewer.stars)}
                             </div>
-                            <p className="line-clamp-2 text-xs text-gray-600">
+                            <p className="line-clamp-2 text-xs text-gray-600 dark:text-gray-300">
                                 "{reviewer.comment}"
                             </p>
                             <div className="mt-1 flex items-center justify-between text-[10px]">
-                                <span className="font-medium text-emerald-600">
+                                <span className="font-medium text-emerald-600 dark:text-emerald-400">
                                     ✓ Verified Customer Review
                                 </span>
                                 <span className="text-gray-400">Just now</span>
@@ -172,32 +216,32 @@ export function ProductDetails() {
 
     return (
         <div className="max-w-xl">
-            <h1 className="text-3xl font-bold text-blue-950">
+            <h1 className="text-3xl font-bold text-blue-950 dark:text-white">
                 <ScrambleText text={productTitle} /> Hint Water
             </h1>
             <p className="mt-2 flex items-center gap-3">
                 <span className="font-semibold text-sm">
                     ⭐⭐⭐⭐⭐ 4.9
                 </span>
-                <span className="text-gray-600 text-sm flex items-center gap-1">
+                <span className="text-gray-600 dark:text-gray-400 text-sm flex items-center gap-1">
                     <AnimateNumber>{reviewCount}</AnimateNumber> Reviews
                 </span>
             </p>
 
             <div className="mt-5">
-                <p className="text-2xl font-semibold text-blue-950">
+                <p className="text-2xl font-semibold text-blue-950 dark:text-blue-400">
                     ${price.toFixed(2)}
                 </p>
 
                 {purchaseType === "subscribe" && (
-                    <p className="mt-1 text-sm text-green-700">
+                    <p className="mt-1 text-sm text-green-700 dark:text-green-400">
                         Subscription savings applied
                     </p>
                 )}
             </div>
 
             <div className="mt-8">
-                <h2 className="mb-3 font-bold">Choose your flavor</h2>
+                <h2 className="mb-3 font-bold text-gray-900 dark:text-gray-100">Choose your flavor</h2>
 
                 <div className="flex flex-wrap gap-2">
                     {flavors.map((item) => {
@@ -207,12 +251,12 @@ export function ProductDetails() {
                                 size="sm"
                                 key={item.id}
                                 variant={isSelected ? "default" : "outline"}
-                                // className={
-                                //     isSelected
-                                //         ? "bg-blue-950 text-white border-blue-950 hover:bg-blue-900 shadow-xs font-semibold"
-                                //         : "border-gray-300 bg-white text-gray-800 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-800"
-                                // }
-                                onClick={() => setSelectedFlavor(item.id)}
+                                className={
+                                    isSelected
+                                        ? "bg-blue-950 text-white border-blue-950 hover:bg-blue-900 dark:bg-blue-600 dark:border-blue-500 dark:hover:bg-blue-500 shadow-xs font-semibold"
+                                        : "border-gray-300 bg-white text-gray-800 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-800"
+                                }
+                                onClick={() => handleFlavorSelect(item.id)}
                             >
                                 {item.name}
                             </Button>
@@ -231,19 +275,19 @@ export function ProductDetails() {
                         <Label
                             htmlFor="purchase-one-time"
                             className={`flex w-full cursor-pointer items-start justify-between rounded-lg border p-4 transition-colors ${purchaseType === "one-time"
-                                ? "border-blue-950 bg-blue-50"
-                                : "border-gray-200 hover:border-gray-300"
+                                ? "border-blue-950 bg-blue-50 dark:border-blue-500 dark:bg-blue-950/40"
+                                : "border-gray-200 hover:border-gray-300 dark:border-gray-800 dark:bg-card dark:hover:border-gray-700"
                                 }`}
                         >
                             <div className="flex items-start gap-3">
                                 <RadioGroupItem value="one-time" id="purchase-one-time" className="mt-0.5" />
                                 <div>
-                                    <span className="font-medium text-sm sm:text-base text-gray-900">
+                                    <span className="font-medium text-sm text-gray-900 dark:text-white">
                                         One Time Purchase
                                     </span>
                                 </div>
                             </div>
-                            <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">
+                            <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
                                 $22.99
                             </span>
                         </Label>
@@ -251,22 +295,22 @@ export function ProductDetails() {
                         <Label
                             htmlFor="purchase-subscribe"
                             className={`flex w-full cursor-pointer items-start justify-between rounded-lg border p-4 transition-colors ${purchaseType === "subscribe"
-                                ? "border-blue-950 bg-blue-50"
-                                : "border-gray-200 hover:border-gray-300"
+                                ? "border-blue-950 bg-blue-50 dark:border-blue-500 dark:bg-blue-950/40"
+                                : "border-gray-200 hover:border-gray-300 dark:border-gray-800 dark:bg-card dark:hover:border-gray-700"
                                 }`}
                         >
                             <div className="flex items-start gap-3">
                                 <RadioGroupItem value="subscribe" id="purchase-subscribe" className="mt-0.5" />
                                 <div>
-                                    <span className="font-medium text-sm sm:text-base text-gray-900">
+                                    <span className="font-medium text-sm text-gray-900 dark:text-white">
                                         Subscribe & Save
                                     </span>
-                                    <span className="block text-xs text-green-700">
+                                    <span className="block text-xs text-green-700 dark:text-green-400">
                                         Save ~17% on deliveries
                                     </span>
                                 </div>
                             </div>
-                            <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">
+                            <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
                                 $18.99
                             </span>
                         </Label>
@@ -277,7 +321,7 @@ export function ProductDetails() {
                         <div className="mt-4">
                             <label
                                 htmlFor="delivery-frequency"
-                                className="mb-2 block text-sm font-medium text-blue-950"
+                                className="mb-2 block text-sm font-medium text-blue-950 dark:text-gray-200"
                             >
                                 Deliver every
                             </label>
@@ -290,7 +334,7 @@ export function ProductDetails() {
                                     <SelectGroup>
                                         <SelectLabel>Frequency</SelectLabel>
                                         {items.map((item) => (
-                                            <SelectItem key={item.value} value={item.value}>
+                                             <SelectItem key={item.value} value={item.value}>
                                                 {item.label}
                                             </SelectItem>
                                         ))}
@@ -298,7 +342,7 @@ export function ProductDetails() {
                                 </SelectContent>
                             </Select>
 
-                            <p className="mt-2 text-xs text-gray-500">
+                            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
                                 No commitment. Cancel anytime.
                             </p>
                         </div>
@@ -309,7 +353,7 @@ export function ProductDetails() {
                         <h2 className="mb-3 font-semibold text-gray-900 dark:text-gray-100">Quantity</h2>
 
                         <div className="flex items-center gap-4">
-                            <div className="flex items-center rounded-lg border">
+                            <div className="flex items-center rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
                                 <Button
                                     variant="secondary"
                                     size="icon"
@@ -322,7 +366,7 @@ export function ProductDetails() {
                                     <HugeiconsIcon icon={MinusSignIcon} className="size-4" />
                                 </Button>
 
-                                <span className="min-w-10 text-center font-medium">
+                                <span className="min-w-10 text-center font-medium text-sm">
                                     <AnimateNumber>{quantity}</AnimateNumber>
                                 </span>
 
@@ -335,7 +379,7 @@ export function ProductDetails() {
                                     <HugeiconsIcon icon={PlusSignIcon} className="size-4" />
                                 </Button>
                             </div>
-                            <span className="text-sm text-gray-600">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">
                                 {quantity} item{quantity > 1 ? "s" : ""}
                             </span>
                         </div>
@@ -354,12 +398,9 @@ export function ProductDetails() {
                             />
 
                             <Button
-                                className="w-full bg-blue-950 py-6 text-base shadow-sm transition-colors hover:bg-blue-900"
-                                onClick={() => {
-                                    alert(
-                                        `Selected: ${selectedFlavor}\nPurchase: ${purchaseType}\nQuantity: ${quantity}`
-                                    );
-                                }}
+                                id="product-buy-now-btn"
+                                className="w-full bg-blue-950 dark:bg-blue-600 text-white py-6 text-base shadow-sm transition-colors hover:bg-blue-900 dark:hover:bg-blue-500 cursor-pointer"
+                                onClick={handleBuyNow}
                             >
                                 <span className="flex items-center gap-3">
                                     <motion.span
@@ -386,8 +427,10 @@ export function ProductDetails() {
                                 className="rounded-md"
                             >
                                 <Button
+                                    id="product-add-to-cart-btn"
                                     size="lg"
-                                    className="w-full py-6 font-bold text-lg shadow-sm"
+                                    onClick={handleAddToCart}
+                                    className="w-full py-6 font-bold text-lg shadow-sm bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-blue-500 dark:hover:bg-blue-400 dark:text-white cursor-pointer"
                                 >
                                     <span className="flex items-center gap-3">
                                         <motion.span

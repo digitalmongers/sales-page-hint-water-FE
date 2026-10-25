@@ -268,31 +268,31 @@ export function ReviewSection({
     >
       {/* Section heading */}
       <div className="mb-10 text-center">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700 dark:text-blue-400">
           Real customer love
         </p>
 
         <h2
           id="reviews-heading"
-          className="mt-3 text-3xl font-bold tracking-tight text-blue-950 sm:text-4xl"
+          className="mt-3 text-3xl font-bold tracking-tight text-blue-950 dark:text-white sm:text-4xl"
         >
           What People Are Saying
         </h2>
 
-        <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-gray-600 sm:text-base">
+        <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-gray-600 dark:text-gray-300 sm:text-base">
           Discover why customers are making fruit-infused water part of their
           everyday routine.
         </p>
       </div>
 
       {/* Rating summary */}
-      <Card className="mb-10 border border-gray-200 ring-0 py-0 shadow-sm">
+      <Card className="mb-10 border border-gray-200 dark:border-gray-800 dark:bg-card ring-0 py-0 shadow-sm">
         <CardContent className="grid gap-8 p-6 md:grid-cols-[0.8fr_1.2fr] md:p-8">
           {/* Overall score */}
           <div className="flex flex-col items-center justify-center text-center">
-            <p className="text-sm font-medium text-gray-500">Overall Rating</p>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Overall Rating</p>
 
-            <p className="mt-2 text-5xl font-extrabold text-blue-950">
+            <p className="mt-2 text-5xl font-extrabold text-blue-950 dark:text-white">
               {averageRating > 0 ? averageRating.toFixed(1) : "0.0"}
             </p>
 
@@ -300,7 +300,7 @@ export function ReviewSection({
               <StarRating rating={Math.round(averageRating)} />
             </div>
 
-            <p className="mt-3 text-sm text-gray-500">
+            <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
               Based on {totalReviews} {totalReviews === 1 ? "review" : "reviews"}
             </p>
           </div>
@@ -317,7 +317,7 @@ export function ReviewSection({
 
               return (
                 <div key={item.stars} className="flex items-center gap-3">
-                  <span className="w-12 shrink-0 text-sm text-gray-600">
+                  <span className="w-12 shrink-0 text-sm text-gray-600 dark:text-gray-300">
                     {item.stars} star
                   </span>
 
@@ -327,7 +327,7 @@ export function ReviewSection({
                     className="h-2 flex-1"
                   />
 
-                  <span className="w-7 text-right text-sm text-gray-500">
+                  <span className="w-7 text-right text-sm text-gray-500 dark:text-gray-400">
                     {item.count}
                   </span>
                 </div>
@@ -340,9 +340,9 @@ export function ReviewSection({
       {/* Reviews heading and action */}
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-xl font-bold text-blue-950">Customer Reviews</h3>
+          <h3 className="text-xl font-bold text-blue-950 dark:text-white">Customer Reviews</h3>
 
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             {reviewList.length > 0
               ? `Showing ${visibleReviews.length} of ${reviewList.length} reviews`
               : "No reviews yet"}
@@ -350,7 +350,7 @@ export function ReviewSection({
         </div>
 
         <Button
-          className="rounded-full bg-blue-950 text-white hover:bg-blue-900 transition-colors cursor-pointer"
+          className="rounded-full bg-blue-950 dark:bg-blue-600 text-white hover:bg-blue-900 dark:hover:bg-blue-500 transition-colors cursor-pointer"
           onClick={handleOpenModal}
         >
           <HugeiconsIcon icon={PenLineIcon} className="mr-2 size-4" />
@@ -360,15 +360,15 @@ export function ReviewSection({
 
       {/* Review cards */}
       {visibleReviews.length === 0 ? (
-        <Card className="border-dashed border-gray-200 bg-gray-50/50 p-12 text-center">
-          <p className="text-base font-semibold text-gray-700">No reviews yet</p>
-          <p className="mt-1 text-sm text-gray-500">
+        <Card className="border-dashed border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/40 p-12 text-center">
+          <p className="text-base font-semibold text-gray-700 dark:text-gray-300">No reviews yet</p>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             Be the first to share your thoughts on this flavor!
           </p>
           <div className="mt-4 flex justify-center">
             <Button
               variant="outline"
-              className="rounded-full border-blue-950 text-blue-950 hover:bg-blue-50 cursor-pointer"
+              className="rounded-full border-blue-950 dark:border-blue-500 text-blue-950 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 cursor-pointer"
               onClick={handleOpenModal}
             >
               <HugeiconsIcon icon={PenLineIcon} className="mr-2 size-4" />
@@ -381,23 +381,23 @@ export function ReviewSection({
           {visibleReviews.map((review) => (
             <Card
               key={review.id}
-              className="border border-gray-200 ring-0 py-0 shadow-sm transition-all duration-200 hover:border-blue-200 hover:shadow-md"
+              className="border border-gray-200 dark:border-gray-800 dark:bg-card ring-0 py-0 shadow-sm transition-all duration-200 hover:border-blue-200 dark:hover:border-blue-700 hover:shadow-md"
             >
               <CardContent className="p-5 sm:p-6">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <Avatar className="size-11">
-                      <AvatarFallback className="bg-blue-100 font-semibold text-blue-950">
+                      <AvatarFallback className="bg-blue-100 dark:bg-blue-950 font-semibold text-blue-950 dark:text-blue-200">
                         {review.initials}
                       </AvatarFallback>
                     </Avatar>
 
                     <div>
-                      <p className="font-semibold text-blue-950">
+                      <p className="font-semibold text-blue-950 dark:text-white">
                         {review.name}
                       </p>
 
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                         {review.date}
                       </p>
                     </div>
@@ -407,17 +407,17 @@ export function ReviewSection({
                 </div>
 
                 {review.title && (
-                  <h4 className="mt-5 font-semibold text-gray-900">
+                  <h4 className="mt-5 font-semibold text-gray-900 dark:text-white">
                     {review.title}
                   </h4>
                 )}
 
-                <p className={`${review.title ? "mt-2" : "mt-5"} text-sm leading-6 text-gray-600`}>
+                <p className={`${review.title ? "mt-2" : "mt-5"} text-sm leading-6 text-gray-600 dark:text-gray-300`}>
                   {review.comment}
                 </p>
 
                 {review.verified && (
-                  <div className="mt-5 flex items-center gap-1.5 text-xs font-medium text-emerald-700">
+                  <div className="mt-5 flex items-center gap-1.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
                     <HugeiconsIcon
                       icon={CheckmarkCircle02Icon}
                       className="size-4 shrink-0"
@@ -436,7 +436,7 @@ export function ReviewSection({
         <div className="mt-8 flex justify-center">
           <Button
             variant="outline"
-            className="rounded-full border-blue-950 px-6 text-blue-950 hover:bg-blue-50 transition-colors cursor-pointer"
+            className="rounded-full border-blue-950 dark:border-blue-500 px-6 text-blue-950 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors cursor-pointer"
             onClick={() =>
               setVisibleCount((current) =>
                 Math.min(current + 4, reviewList.length)
@@ -451,12 +451,12 @@ export function ReviewSection({
 
       {/* Write a Review Shadcn Dialog */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto bg-white p-6 sm:p-8">
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto bg-white dark:bg-card p-6 sm:p-8">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-blue-950">
+            <DialogTitle className="text-2xl font-bold text-blue-950 dark:text-white">
               Write a Review
             </DialogTitle>
-            <DialogDescription className="text-sm text-gray-600">
+            <DialogDescription className="text-sm text-gray-600 dark:text-gray-300">
               Share your experience with Peach Raspberry Hint® Water with other shoppers.
             </DialogDescription>
           </DialogHeader>
@@ -464,7 +464,7 @@ export function ReviewSection({
           <form onSubmit={handleSubmitReview} className="space-y-5 mt-2">
             {/* Interactive Star Rating */}
             <div className="flex flex-col items-center justify-center space-y-2 py-1">
-              <Label className="text-sm font-semibold text-gray-800 w-full text-left">
+              <Label className="text-sm font-semibold text-gray-800 dark:text-gray-200 w-full text-left">
                 Overall Rating <span className="text-rose-500">*</span>
               </Label>
               <div
@@ -525,7 +525,7 @@ export function ReviewSection({
 
             {/* Email Address */}
             <div className="space-y-1.5">
-              <Label htmlFor="reviewer-email" className="text-sm font-semibold text-gray-800">
+              <Label htmlFor="reviewer-email" className="text-sm font-semibold text-gray-800 dark:text-gray-200">
                 Email Address <span className="text-rose-500">*</span>
               </Label>
               <Input
@@ -535,9 +535,9 @@ export function ReviewSection({
                 value={formEmail}
                 onChange={(e) => setFormEmail(e.target.value)}
                 placeholder="e.g., emily@example.com"
-                className="border-gray-300 focus-visible:border-blue-900 focus-visible:ring-blue-950/20"
+                className="border-gray-300 dark:border-gray-700 focus-visible:border-blue-900 focus-visible:ring-blue-950/20"
               />
-              <p className="text-[11px] text-gray-500">
+              <p className="text-[11px] text-gray-500 dark:text-gray-400">
                 Will not be shown publicly.
               </p>
             </div>
@@ -547,7 +547,7 @@ export function ReviewSection({
               <Button
                 type="button"
                 variant="outline"
-                className="rounded-full border-gray-300 text-gray-700 hover:bg-gray-100 cursor-pointer"
+                className="rounded-full border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
                 onClick={() => setIsModalOpen(false)}
               >
                 Cancel
@@ -555,7 +555,7 @@ export function ReviewSection({
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="rounded-full bg-blue-950 text-white hover:bg-blue-900 cursor-pointer"
+                className="rounded-full bg-blue-950 dark:bg-blue-600 text-white hover:bg-blue-900 dark:hover:bg-blue-500 cursor-pointer"
               >
                 {isSubmitting ? "Submitting..." : "Submit Review"}
               </Button>

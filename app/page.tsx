@@ -14,15 +14,45 @@ import { Button } from "@/components/ui/button";
 import { LoginModal, type UserProfile } from "@/components/auth/login-modal";
 import { LogoutModal } from "@/components/auth/logout-modal";
 import { CartDrawer } from "@/components/cart/cart-drawer";
+import { ExpressCheckoutModal } from "@/components/checkout/express-checkout-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { toast } from "sonner";
+import { useCart } from "@/hooks/use-cart";
+
+const flavorImages: Record<string, { image: string; alt: string }> = {
+  "peach-raspberry": {
+    image: "/images/peachRaspberry.svg",
+    alt: "Raspberry Hint® Water",
+  },
+  watermelon: {
+    image: "/images/watermelon.webp",
+    alt: "Watermelon Hint® Water",
+  },
+  "black-berry": {
+    image: "/images/blackberry.webp",
+    alt: "Blackberry Hint® Water",
+  },
+  coconut: {
+    image: "/images/coconut.webp",
+    alt: "Coconut Hint® Water",
+  },
+  pineapple: {
+    image: "/images/pineapple.webp",
+    alt: "Pineapple Hint® Water",
+  },
+};
 
 export default function Page() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const { isCartOpen, setIsCartOpen, totalItemCount } = useCart();
+  const [selectedFlavor, setSelectedFlavor] = useState("peach-raspberry");
   const [user, setUser] = useState<UserProfile | null>(null);
+
+  const currentFlavor =
+    flavorImages[selectedFlavor] || flavorImages["peach-raspberry"];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,45 +65,48 @@ export default function Page() {
   }, []);
 
   return (
-    <main className="min-h-screen w-full overflow-x-clip bg-white">
+    <main className="min-h-screen w-full overflow-x-clip bg-white dark:bg-background text-foreground">
       {/* Slide-in Header (Visible on Scroll) */}
       <header
         aria-hidden={!isScrolled}
-        className={`fixed top-0 left-0 right-0 z-50 w-full border-b border-gray-100 bg-white/95 backdrop-blur-md shadow-xs transition-all duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 right-0 z-50 w-full border-b border-gray-100 dark:border-gray-800 bg-white/95 dark:bg-background/95 backdrop-blur-md shadow-xs transition-all duration-300 ease-in-out ${
           isScrolled
             ? "translate-y-0 opacity-100"
             : "-translate-y-full opacity-0 pointer-events-none"
         }`}
       >
         <nav className="relative mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 py-3.5">
-          <div className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-700">
-            <a href="#" className="hover:text-blue-950 transition-colors">Water</a>
-            <a href="#" className="hover:text-blue-950 transition-colors">Our story</a>
+          <div className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <a href="#" className="hover:text-blue-950 dark:hover:text-white transition-colors">Water</a>
+            <a href="#" className="hover:text-blue-950 dark:hover:text-white transition-colors">Our story</a>
           </div>
 
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
             <a
               href="#"
               aria-label="Hint home"
-              className="text-2xl sm:text-3xl font-extrabold text-blue-950 tracking-tight"
+              className="text-2xl sm:text-3xl font-extrabold text-blue-950 dark:text-white tracking-tight"
             >
               Hint Water
             </a>
           </div>
 
-          <div className="ml-auto flex items-center gap-3 sm:gap-4 text-sm font-medium text-gray-700">
+          <div className="ml-auto flex items-center gap-2 sm:gap-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <ThemeToggle />
             <Button
               id="sticky-cart-btn"
               variant="ghost"
               size="icon"
               aria-label="Shopping cart"
               onClick={() => setIsCartOpen(true)}
-              className="relative flex items-center gap-1.5 hover:text-blue-950 transition-colors cursor-pointer"
+              className="relative flex items-center gap-1.5 hover:text-blue-950 dark:hover:text-white transition-colors cursor-pointer"
             >
               <HugeiconsIcon icon={ShoppingBag01Icon} className="size-6" />
-              <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-blue-950 text-[10px] font-bold text-white ring-2 ring-white">
-                1
-              </span>
+              {totalItemCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-blue-950 dark:bg-blue-600 text-[10px] font-bold text-white ring-2 ring-white dark:ring-background">
+                  {totalItemCount}
+                </span>
+              )}
             </Button>
             {user ? (
               <button
@@ -84,9 +117,9 @@ export default function Page() {
                 title={`${user.name} — Log out`}
                 aria-label={`${user.name} profile, click to log out`}
               >
-                <Avatar className="size-8 ring-2 ring-blue-950/20 group-hover:ring-blue-950 transition-all shadow-xs">
+                <Avatar className="size-8 ring-2 ring-blue-950/20 dark:ring-blue-400/30 group-hover:ring-blue-950 dark:group-hover:ring-blue-400 transition-all shadow-xs">
                   <AvatarImage src={user.avatarUrl} alt={user.name} />
-                  <AvatarFallback className="bg-blue-950 text-white font-medium text-xs">
+                  <AvatarFallback className="bg-blue-950 dark:bg-blue-600 text-white font-medium text-xs">
                     {user.name.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
@@ -96,7 +129,7 @@ export default function Page() {
                 id="sticky-login-btn"
                 variant="link"
                 onClick={() => setIsLoginOpen(true)}
-                className="text-sm font-medium text-blue-950 hover:text-blue-900"
+                className="text-sm font-medium text-blue-950 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
               >
                 Login
               </Button>
@@ -106,18 +139,18 @@ export default function Page() {
       </header>
 
       {/* Static Default Header (Normal flow, non-sticky) */}
-      <header className="w-full border-b border-gray-100 bg-white">
+      <header className="w-full border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-background">
         {/* Announcement bar */}
-        <div className="bg-blue-950 text-white flex items-center justify-center py-2 px-4 text-xs font-bold text-center">
+        <div className="bg-blue-950 dark:bg-blue-900 text-white flex items-center justify-center py-2 px-4 text-xs font-bold text-center">
           <p>Hint Water is Now LIVE!</p>
         </div>
 
         {/* Main Navigation */}
         <nav className="relative mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 py-4">
           {/* Left Group (visible on medium screens and up) */}
-          <div className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-700">
-            <a href="#" className="hover:text-blue-950 transition-colors">Water</a>
-            <a href="#" className="hover:text-blue-950 transition-colors">Our story</a>
+          <div className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <a href="#" className="hover:text-blue-950 dark:hover:text-white transition-colors">Water</a>
+            <a href="#" className="hover:text-blue-950 dark:hover:text-white transition-colors">Our story</a>
           </div>
 
           {/* Logo */}
@@ -125,26 +158,29 @@ export default function Page() {
             <a
               href="#"
               aria-label="Hint home"
-              className="text-2xl sm:text-3xl font-extrabold text-blue-950 tracking-tight"
+              className="text-2xl sm:text-3xl font-extrabold text-blue-950 dark:text-white tracking-tight"
             >
               Hint Water
             </a>
           </div>
 
           {/* Right Group */}
-          <div className="ml-auto flex items-center gap-3 sm:gap-4 text-sm font-medium text-gray-700">
+          <div className="ml-auto flex items-center gap-2 sm:gap-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <ThemeToggle />
             <Button
               id="header-cart-btn"
               aria-label="Shopping cart"
               variant="ghost"
               size="icon"
               onClick={() => setIsCartOpen(true)}
-              className="relative flex items-center gap-1.5 hover:text-blue-950 transition-colors cursor-pointer"
+              className="relative flex items-center gap-1.5 hover:text-blue-950 dark:hover:text-white transition-colors cursor-pointer"
             >
               <HugeiconsIcon icon={ShoppingBag01Icon} className="size-6" />
-              <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-blue-950 text-[10px] font-bold text-white ring-2 ring-white">
-                1
-              </span>
+              {totalItemCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-blue-950 dark:bg-blue-600 text-[10px] font-bold text-white ring-2 ring-white dark:ring-background">
+                  {totalItemCount}
+                </span>
+              )}
             </Button>
             {user ? (
               <button
@@ -155,9 +191,9 @@ export default function Page() {
                 title={`${user.name} — Log out`}
                 aria-label={`${user.name} profile, click to log out`}
               >
-                <Avatar className="size-8 ring-2 ring-blue-950/20 group-hover:ring-blue-950 transition-all shadow-xs">
+                <Avatar className="size-8 ring-2 ring-blue-950/20 dark:ring-blue-400/30 group-hover:ring-blue-950 dark:group-hover:ring-blue-400 transition-all shadow-xs">
                   <AvatarImage src={user.avatarUrl} alt={user.name} />
-                  <AvatarFallback className="bg-blue-950 text-white font-medium text-xs">
+                  <AvatarFallback className="bg-blue-950 dark:bg-blue-600 text-white font-medium text-xs">
                     {user.name.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
@@ -167,7 +203,7 @@ export default function Page() {
                 id="header-login-btn"
                 variant="link"
                 onClick={() => setIsLoginOpen(true)}
-                className="text-sm font-medium text-blue-950 hover:text-blue-900"
+                className="text-sm font-medium text-blue-950 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
               >
                 Login
               </Button>
@@ -177,20 +213,24 @@ export default function Page() {
       </header>
 
       <section className="mx-auto w-full max-w-7xl grid grid-cols-1 gap-8 md:gap-10 px-4 sm:px-6 py-6 md:py-10 md:grid-cols-2 items-center">
-        <div className="w-full min-w-0 flex min-h-[350px] md:min-h-[500px] items-center justify-center bg-white">
+        <div className="w-full min-w-0 flex min-h-[350px] md:min-h-[500px] items-center justify-center bg-white dark:bg-card/40 rounded-2xl">
           <Image
-            src="/images/peachRaspberry.svg"
-            alt="Peach Raspberry Hint® Water"
+            key={selectedFlavor}
+            src={currentFlavor.image}
+            alt={currentFlavor.alt}
             width={400}
             height={600}
             priority
-            className="max-w-full max-h-[500px] h-[350px] sm:h-[420px] md:h-[500px] w-auto object-contain"
+            className="max-w-full max-h-[500px] h-[350px] sm:h-[420px] md:h-[500px] w-auto object-contain transition-all duration-300"
           />
         </div>
 
         <div>
           {/* product details goes here */}
-          <ProductDetails />
+          <ProductDetails
+            selectedFlavor={selectedFlavor}
+            onSelectFlavor={setSelectedFlavor}
+          />
         </div>
       </section>
       <RelatedProducts />
@@ -216,6 +256,7 @@ export default function Page() {
       />
 
       <CartDrawer open={isCartOpen} onOpenChange={setIsCartOpen} />
+      <ExpressCheckoutModal />
     </main>
   );
 }
