@@ -14,6 +14,7 @@ const fontMono = Geist_Mono({
 })
 
 import { Toaster } from "@/components/ui/sonner";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export default function RootLayout({
   children,
@@ -29,6 +30,7 @@ export default function RootLayout({
       <body>
         <ThemeProvider>{children}</ThemeProvider>
         <Toaster position="bottom-left" />
+        <SpeedInsights />
       </body>
     </html>
   )
