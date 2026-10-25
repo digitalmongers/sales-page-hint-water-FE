@@ -81,17 +81,17 @@ export default function Page() {
             <a href="#" className="hover:text-blue-950 dark:hover:text-white transition-colors">Our story</a>
           </div>
 
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
+          <div className="flex items-center md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 pointer-events-auto">
             <a
               href="#"
               aria-label="Hint home"
-              className="text-2xl sm:text-3xl font-extrabold text-blue-950 dark:text-white tracking-tight"
+              className="text-xl sm:text-2xl md:text-3xl font-extrabold text-blue-950 dark:text-white tracking-tight"
             >
               Hint Water
             </a>
           </div>
 
-          <div className="ml-auto flex items-center gap-2 sm:gap-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+          <div className="flex items-center gap-1.5 sm:gap-3 text-sm font-medium text-gray-700 dark:text-gray-300">
             <ThemeToggle />
             <Button
               id="sticky-cart-btn"
@@ -101,7 +101,7 @@ export default function Page() {
               onClick={() => setIsCartOpen(true)}
               className="relative flex items-center gap-1.5 hover:text-blue-950 dark:hover:text-white transition-colors cursor-pointer"
             >
-              <HugeiconsIcon icon={ShoppingBag01Icon} className="size-6" />
+              <HugeiconsIcon icon={ShoppingBag01Icon} className="size-5" />
               {totalItemCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-blue-950 dark:bg-blue-600 text-[10px] font-bold text-white ring-2 ring-white dark:ring-background">
                   {totalItemCount}
@@ -141,7 +141,7 @@ export default function Page() {
       {/* Static Default Header (Normal flow, non-sticky) */}
       <header className="w-full border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-background">
         {/* Announcement bar */}
-        <div className="bg-blue-950 dark:bg-blue-900 text-white flex items-center justify-center py-2 px-4 text-xs font-bold text-center">
+        <div className="bg-blue-950 dark:bg-blue-900 text-white flex items-center justify-center py-2 px-4 text-xs font-bold text-center ">
           <p>Hint Water is Now LIVE!</p>
         </div>
 
@@ -154,18 +154,18 @@ export default function Page() {
           </div>
 
           {/* Logo */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
+          <div className="flex items-center md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 pointer-events-auto">
             <a
               href="#"
               aria-label="Hint home"
-              className="text-2xl sm:text-3xl font-extrabold text-blue-950 dark:text-white tracking-tight"
+              className="text-xl sm:text-2xl md:text-3xl font-extrabold text-blue-950 dark:text-white tracking-tight"
             >
               Hint Water
             </a>
           </div>
 
           {/* Right Group */}
-          <div className="ml-auto flex items-center gap-2 sm:gap-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+          <div className="flex items-center gap-1.5 sm:gap-3 text-sm font-medium text-gray-700 dark:text-gray-300">
             <ThemeToggle />
             <Button
               id="header-cart-btn"
@@ -175,7 +175,7 @@ export default function Page() {
               onClick={() => setIsCartOpen(true)}
               className="relative flex items-center gap-1.5 hover:text-blue-950 dark:hover:text-white transition-colors cursor-pointer"
             >
-              <HugeiconsIcon icon={ShoppingBag01Icon} className="size-6" />
+              <HugeiconsIcon icon={ShoppingBag01Icon} className="size-5" />
               {totalItemCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-blue-950 dark:bg-blue-600 text-[10px] font-bold text-white ring-2 ring-white dark:ring-background">
                   {totalItemCount}

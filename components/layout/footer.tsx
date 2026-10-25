@@ -3,9 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-    InstagramIcon,
-    Facebook02Icon,
-    YoutubeIcon,
+    WhatsappIcon,
+    Linkedin02Icon,
+    Globe02Icon,
     ArrowRight01Icon,
 } from "@hugeicons/core-free-icons";
 
@@ -51,33 +51,33 @@ export function Footer() {
 
                         <div className="mt-6 flex items-center gap-4">
                             <Link
-                                href="https://www.instagram.com/"
+                                href="https://wa.me/919897266808"
                                 target="_blank"
                                 rel="noreferrer"
-                                aria-label="Instagram"
+                                aria-label="WhatsApp"
                                 className="rounded-full p-2 transition-colors hover:bg-white/10"
                             >
-                                <HugeiconsIcon icon={InstagramIcon} className="size-5" />
+                                <HugeiconsIcon icon={WhatsappIcon} className="size-5" />
                             </Link>
 
                             <Link
-                                href="https://www.facebook.com/"
+                                href="https://www.linkedin.com/in/syed-shahnawaz-ali/"
                                 target="_blank"
                                 rel="noreferrer"
-                                aria-label="Facebook"
+                                aria-label="LinkedIn"
                                 className="rounded-full p-2 transition-colors hover:bg-white/10"
                             >
-                                <HugeiconsIcon icon={Facebook02Icon} className="size-5" />
+                                <HugeiconsIcon icon={Linkedin02Icon} className="size-5" />
                             </Link>
 
                             <Link
-                                href="https://www.youtube.com/"
+                                href="https://digitalmongers.com"
                                 target="_blank"
                                 rel="noreferrer"
-                                aria-label="YouTube"
+                                aria-label="Website"
                                 className="rounded-full p-2 transition-colors hover:bg-white/10"
                             >
-                                <HugeiconsIcon icon={YoutubeIcon} className="size-5" />
+                                <HugeiconsIcon icon={Globe02Icon} className="size-5" />
                             </Link>
                         </div>
                     </div>
