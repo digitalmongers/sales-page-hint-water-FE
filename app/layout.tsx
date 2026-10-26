@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { CartProvider } from "@/hooks/use-cart";
 import { ProductSchema } from "@/components/seo/product-schema";
+import { MicrosoftClarity } from "@/components/analytics/microsoft-clarity";
 
 const notoSansHeading = Noto_Sans({
   subsets: ["latin"],
@@ -129,6 +130,7 @@ export default function RootLayout({
     >
       <head>
         <ProductSchema />
+        <MicrosoftClarity />
       </head>
       <body>
         <ThemeProvider>
