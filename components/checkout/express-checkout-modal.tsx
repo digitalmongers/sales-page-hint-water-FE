@@ -181,11 +181,11 @@ export function ExpressCheckoutModal() {
     <Dialog open={isCheckoutOpen} onOpenChange={handleClose}>
       <DialogContent
         id="express-checkout-dialog"
-        className="max-h-[92vh] overflow-y-auto sm:max-w-4xl p-0 gap-0 bg-white dark:bg-card border border-border text-foreground shadow-2xl"
+        className="max-h-[92vh] overflow-y-auto overflow-x-hidden w-[calc(100%-1rem)] sm:w-full sm:max-w-4xl p-0 gap-0 bg-white dark:bg-card border border-border text-foreground shadow-2xl"
       >
         {isSuccess ? (
           /* ==================== SHADCN ORDER CONFIRMATION SCREEN ==================== */
-          <div className="p-6 sm:p-12 flex flex-col items-center text-center">
+          <div className="p-4 sm:p-12 flex flex-col items-center text-center w-full max-w-full overflow-x-hidden">
             <motion.div
               initial={{ scale: 0, rotate: -30 }}
               animate={{ scale: 1, rotate: 0 }}
@@ -206,21 +206,21 @@ export function ExpressCheckoutModal() {
               Order Confirmed
             </Badge>
 
-            <DialogTitle className="text-2xl sm:text-3xl font-extrabold text-blue-950 dark:text-white tracking-tight">
+            <DialogTitle className="text-2xl sm:text-3xl font-extrabold text-blue-950 dark:text-white tracking-tight break-words">
               Thank You for Your Order!
             </DialogTitle>
             <DialogDescription className="mt-2 text-sm text-muted-foreground max-w-md">
               We&apos;ve sent your order receipt and tracking link to{" "}
-              <span className="font-semibold text-foreground">{email}</span>.
+              <span className="font-semibold text-foreground break-all">{email}</span>.
             </DialogDescription>
 
             {/* Order Details Card */}
-            <Card className="mt-6 w-full max-w-lg border-border bg-muted/40 p-5 text-left gap-4">
+            <Card className="mt-6 w-full max-w-lg border-border bg-muted/40 p-4 sm:p-5 text-left gap-4">
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
-                <div>
+                <div className="min-w-0">
                   <span className="text-[11px] font-semibold uppercase text-muted-foreground">Order Number</span>
-                  <p className="text-sm font-extrabold text-blue-950 dark:text-white flex items-center gap-2">
-                    {orderNumber}
+                  <p className="text-sm font-extrabold text-blue-950 dark:text-white flex items-center gap-2 flex-wrap">
+                    <span className="break-all">{orderNumber}</span>
                     <Button
                       variant="link"
                       size="xs"
@@ -251,11 +251,11 @@ export function ExpressCheckoutModal() {
                 <div className="mt-3">
                   <Progress value={50} className="h-1.5 bg-muted" />
                 </div>
-                <div className="flex justify-between text-[10px] text-muted-foreground mt-1 font-medium">
-                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Order Placed</span>
+                <div className="grid grid-cols-4 text-[9px] sm:text-[10px] text-muted-foreground mt-1 font-medium text-center">
+                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold text-left">Order Placed</span>
                   <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Processing</span>
                   <span>Shipped</span>
-                  <span>Delivered</span>
+                  <span className="text-right">Delivered</span>
                 </div>
               </div>
 
@@ -291,31 +291,31 @@ export function ExpressCheckoutModal() {
           </div>
         ) : (
           /* ==================== SHADCN CHECKOUT SCREEN ==================== */
-          <div>
+          <div className="w-full max-w-full overflow-x-hidden">
             {/* Top Security Header */}
             <DialogHeader className="p-0">
-              <div className="flex items-center justify-between pl-6 pr-14 py-4 border-b border-border bg-card">
-                <div className="flex items-center gap-2.5">
-                  <DialogTitle className="text-lg font-black tracking-tight text-blue-950 dark:text-white">
+              <div className="flex items-center justify-between pl-4 sm:pl-6 pr-12 sm:pr-14 py-3.5 sm:py-4 border-b border-border bg-card gap-2 min-w-0">
+                <div className="flex items-center gap-2 min-w-0 shrink">
+                  <DialogTitle className="text-base sm:text-lg font-black tracking-tight text-blue-950 dark:text-white shrink-0">
                     Hint<sup className="text-[10px]">®</sup>
                   </DialogTitle>
                   <span className="text-muted-foreground/40">|</span>
-                  <DialogDescription className="text-xs font-semibold text-muted-foreground">
+                  <DialogDescription className="text-xs font-semibold text-muted-foreground truncate">
                     Express Checkout
                   </DialogDescription>
                 </div>
 
-                <Badge className="gap-1.5 text-xs font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1 rounded-full border border-emerald-200/80 dark:border-emerald-800/80">
-                  <HugeiconsIcon icon={SecurityCheckIcon} className="size-4" />
-                  256-Bit SSL Encrypted
+                <Badge className="gap-1 text-[11px] sm:text-xs font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 sm:px-3 py-1 rounded-full border border-emerald-200/80 dark:border-emerald-800/80 shrink-0">
+                  <HugeiconsIcon icon={SecurityCheckIcon} className="size-3.5 sm:size-4" />
+                  <span className="hidden sm:inline">256-Bit </span>SSL Encrypted
                 </Badge>
               </div>
             </DialogHeader>
 
             {/* Split Columns Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-border">
+            <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-border w-full max-w-full">
               {/* LEFT COLUMN: Checkout Form (7 cols) */}
-              <div className="lg:col-span-7 p-6 sm:p-7 space-y-6">
+              <div className="lg:col-span-7 p-4 sm:p-7 space-y-6 min-w-0">
                 {/* 1. Express 1-Click Pay Options (Shopify / ShopPay Standard) */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
@@ -325,13 +325,13 @@ export function ExpressCheckoutModal() {
                     <span className="text-[11px] text-muted-foreground">1-click instant order</span>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2.5">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
                     {/* Shop Pay */}
                     <Button
                       size="lg"
                       disabled={isSubmitting}
                       onClick={() => handlePlaceOrder("Shop Pay")}
-                      className="bg-[#5A31F4] hover:bg-[#4924D6] text-white flex items-center justify-center cursor-pointer shadow-xs transition-transform active:scale-98"
+                      className="bg-[#5A31F4] hover:bg-[#4924D6] text-white flex items-center justify-center cursor-pointer shadow-xs transition-transform active:scale-98 min-w-0 px-1 sm:px-2.5"
                       title="Pay with Shop Pay"
                     >
                       <ShopPaySvg />
@@ -342,7 +342,7 @@ export function ExpressCheckoutModal() {
                       size="lg"
                       disabled={isSubmitting}
                       onClick={() => handlePlaceOrder("Apple Pay")}
-                      className="bg-black hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 text-white flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-transform active:scale-98"
+                      className="bg-black hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 text-white flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer shadow-xs transition-transform active:scale-98 min-w-0 px-1 sm:px-2.5"
                       title="Pay with Apple Pay"
                     >
                       <ApplePaySvg />
@@ -355,7 +355,7 @@ export function ExpressCheckoutModal() {
                       disabled={isSubmitting}
                       onClick={() => handlePlaceOrder("Google Pay")}
                       variant="outline"
-                      className="bg-white hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border-border flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-transform active:scale-98"
+                      className="bg-white hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-800 border-border flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer shadow-xs transition-transform active:scale-98 min-w-0 px-1 sm:px-2.5"
                       title="Pay with Google Pay"
                     >
                       <GooglePaySvg />
@@ -407,69 +407,69 @@ export function ExpressCheckoutModal() {
                     Shipping Address
                   </h3>
                   <div className="space-y-3">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+                      <div className="min-w-0">
                         <Label htmlFor="first-name" className="text-[11px] text-muted-foreground">First Name</Label>
                         <Input
                           id="first-name"
                           value={firstName}
                           onChange={(e) => setFirstName(e.target.value)}
                           placeholder="First Name"
-                          className="mt-1 bg-background border-input"
+                          className="mt-1 bg-background border-input text-xs sm:text-sm"
                         />
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <Label htmlFor="last-name" className="text-[11px] text-muted-foreground">Last Name</Label>
                         <Input
                           id="last-name"
                           value={lastName}
                           onChange={(e) => setLastName(e.target.value)}
                           placeholder="Last Name"
-                          className="mt-1 bg-background border-input"
+                          className="mt-1 bg-background border-input text-xs sm:text-sm"
                         />
                       </div>
                     </div>
 
-                    <div>
+                    <div className="min-w-0">
                       <Label htmlFor="address-line" className="text-[11px] text-muted-foreground">Street Address</Label>
                       <Input
                         id="address-line"
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
                         placeholder="Street Address"
-                        className="mt-1 bg-background border-input"
+                        className="mt-1 bg-background border-input text-xs sm:text-sm"
                       />
                     </div>
 
-                    <div className="grid grid-cols-3 gap-2.5">
-                      <div>
+                    <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
+                      <div className="min-w-0">
                         <Label htmlFor="city-input" className="text-[11px] text-muted-foreground">City</Label>
                         <Input
                           id="city-input"
                           value={city}
                           onChange={(e) => setCity(e.target.value)}
                           placeholder="City"
-                          className="mt-1 bg-background border-input"
+                          className="mt-1 bg-background border-input text-xs sm:text-sm px-2 sm:px-2.5"
                         />
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <Label htmlFor="state-input" className="text-[11px] text-muted-foreground">State</Label>
                         <Input
                           id="state-input"
                           value={state}
                           onChange={(e) => setState(e.target.value)}
                           placeholder="State"
-                          className="mt-1 bg-background border-input"
+                          className="mt-1 bg-background border-input text-xs sm:text-sm px-2 sm:px-2.5"
                         />
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <Label htmlFor="zip-input" className="text-[11px] text-muted-foreground">ZIP</Label>
                         <Input
                           id="zip-input"
                           value={zip}
                           onChange={(e) => setZip(e.target.value)}
                           placeholder="ZIP"
-                          className="mt-1 bg-background border-input"
+                          className="mt-1 bg-background border-input text-xs sm:text-sm px-2 sm:px-2.5"
                         />
                       </div>
                     </div>
@@ -561,7 +561,7 @@ export function ExpressCheckoutModal() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
-                      <div>
+                      <div className="min-w-0">
                         <Label htmlFor="checkout-card-expiry" className="text-[11px] text-muted-foreground">
                           Expiration (MM/YY)
                         </Label>
@@ -573,7 +573,7 @@ export function ExpressCheckoutModal() {
                           className="mt-1 bg-background font-mono text-sm border-input"
                         />
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <Label htmlFor="checkout-card-cvc" className="text-[11px] text-muted-foreground">
                           Security CVC
                         </Label>
@@ -591,7 +591,7 @@ export function ExpressCheckoutModal() {
               </div>
 
               {/* RIGHT COLUMN: Order Summary & Pay Action (5 cols) */}
-              <div className="lg:col-span-5 p-6 sm:p-7 bg-muted/30 flex flex-col justify-between space-y-6">
+              <div className="lg:col-span-5 p-4 sm:p-7 bg-muted/30 flex flex-col justify-between space-y-6 min-w-0">
                 <div>
                   <div className="flex items-center justify-between pb-3 border-b border-border">
                     <h3 className="text-sm font-bold text-blue-950 dark:text-white">
@@ -603,7 +603,7 @@ export function ExpressCheckoutModal() {
                   </div>
 
                   {/* Items list with Shopify-style floating count badge */}
-                  <div className="mt-4 space-y-3.5 max-h-56 overflow-z-auto pr-1">
+                  <div className="mt-4 space-y-3.5 max-h-56 overflow-y-auto pr-1">
                     {itemsToBuy.map((item) => (
                       <div
                         key={item.id}
@@ -648,7 +648,7 @@ export function ExpressCheckoutModal() {
 
                   {/* Promo Code Input */}
                   <form onSubmit={handleApplyPromo} className="mt-5 flex gap-2">
-                    <div className="relative flex-1">
+                    <div className="relative flex-1 min-w-0">
                       <HugeiconsIcon
                         icon={Ticket01Icon}
                         className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground"
@@ -658,12 +658,12 @@ export function ExpressCheckoutModal() {
                         placeholder="Discount code (e.g. HINT10)"
                         value={promoCode}
                         onChange={(e) => setPromoCode(e.target.value)}
-                        className="pl-9 text-xs uppercase tracking-wider bg-background border-input"
+                        className="pl-9 text-xs uppercase tracking-wider bg-background border-input min-w-0"
                       />
                     </div>
                     <Button
                       variant="secondary"
-                      className="text-xs font-semibold px-4 cursor-pointer"
+                      className="text-xs font-semibold px-3 sm:px-4 cursor-pointer shrink-0"
                     >
                       Apply
                     </Button>
@@ -734,11 +734,11 @@ export function ExpressCheckoutModal() {
                     )}
                   </Button>
 
-                  <div className="flex items-center justify-center gap-4 text-[11px] text-muted-foreground pt-1">
+                  <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground pt-1 text-center">
                     <span>✓ 30-Day Guarantee</span>
-                    <span>•</span>
+                    <span className="hidden xs:inline sm:inline">•</span>
                     <span>✓ Free Returns</span>
-                    <span>•</span>
+                    <span className="hidden xs:inline sm:inline">•</span>
                     <span>✓ Instant Confirmation</span>
                   </div>
                 </div>
