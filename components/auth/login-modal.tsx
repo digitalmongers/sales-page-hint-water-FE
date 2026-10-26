@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
+import { validateEmail, validateName, sanitizeText } from "@/lib/validation";
 
 export interface UserProfile {
   name: string;
@@ -250,10 +251,34 @@ export function LoginModal({
 
   const handleEmail = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!start("email")) return;
     const formData = new FormData(e.currentTarget);
-    const formName = (formData.get("name") as string)?.trim();
-    const formEmail = (formData.get("email") as string)?.trim() || "alex@example.com";
+    const rawEmail = (formData.get("email") as string) || "";
+    const rawName = (formData.get("name") as string) || "";
+    const rawPassword = (formData.get("password") as string) || "";
+
+    const emailCheck = validateEmail(rawEmail);
+    if (!emailCheck.isValid) {
+      toast.error(emailCheck.error || "Please enter a valid email address.");
+      return;
+    }
+
+    if (mode === "signup") {
+      const nameCheck = validateName(rawName, "Full name");
+      if (!nameCheck.isValid) {
+        toast.error(nameCheck.error || "Please enter a valid full name.");
+        return;
+      }
+    }
+
+    if (!rawPassword || rawPassword.length < 8) {
+      toast.error("Password must be at least 8 characters.");
+      return;
+    }
+
+    if (!start("email")) return;
+
+    const formName = sanitizeText(rawName);
+    const formEmail = emailCheck.sanitizedValue!;
     const name = formName || (mode === "login" ? "Alex Morgan" : "New User");
     setTimeout(
       () =>

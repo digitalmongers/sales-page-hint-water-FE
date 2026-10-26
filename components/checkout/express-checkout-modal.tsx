@@ -34,6 +34,25 @@ import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { useCart } from "@/hooks/use-cart";
 import { Badge } from "../ui/badge";
+import {
+  validateEmail,
+  validateName,
+  validateAddress,
+  validateCity,
+  validateState,
+  validateZip,
+  validateCardNumber,
+  validateExpiry,
+  validateCvc,
+  validatePromoCode,
+  formatCardNumber,
+  formatExpiry,
+  formatZipCode,
+  detectCardBrand,
+  sanitizeDigits,
+  type CardBrand,
+} from "@/lib/validation";
+import { cn } from "@/lib/utils";
 
 const FREE_SHIPPING_THRESHOLD = 40.0;
 
@@ -77,19 +96,45 @@ function ShopPaySvg() {
   );
 }
 
-function VisaBadge() {
+function VisaBadge({ active }: { active?: boolean }) {
   return (
-    <span className="inline-flex items-center px-1.5 py-0.5 rounded border border-blue-900/20 bg-blue-50 dark:bg-blue-950/60 font-black italic text-[10px] text-blue-700 dark:text-blue-300">
+    <span
+      className={`inline-flex items-center px-1.5 py-0.5 rounded border text-[10px] font-black italic transition-all ${
+        active
+          ? "border-blue-600 bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 ring-2 ring-blue-500/30"
+          : "border-blue-900/20 bg-blue-50/50 dark:bg-blue-950/40 text-blue-700/60 dark:text-blue-400/60"
+      }`}
+    >
       VISA
     </span>
   );
 }
 
-function MastercardBadge() {
+function MastercardBadge({ active }: { active?: boolean }) {
   return (
-    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-amber-900/20 bg-amber-50 dark:bg-amber-950/60 font-bold text-[10px] text-amber-700 dark:text-amber-300">
+    <span
+      className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border text-[10px] font-bold transition-all ${
+        active
+          ? "border-amber-600 bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 ring-2 ring-amber-500/30"
+          : "border-amber-900/20 bg-amber-50/50 dark:bg-amber-950/40 text-amber-700/60 dark:text-amber-400/60"
+      }`}
+    >
       <span className="size-2 rounded-full bg-red-500 inline-block -mr-1"></span>
       <span className="size-2 rounded-full bg-amber-400 inline-block"></span>
+    </span>
+  );
+}
+
+function AmexBadge({ active }: { active?: boolean }) {
+  return (
+    <span
+      className={`inline-flex items-center px-1.5 py-0.5 rounded border text-[10px] font-extrabold transition-all ${
+        active
+          ? "border-sky-500 bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-300 ring-2 ring-sky-500/30"
+          : "border-sky-900/20 bg-sky-50/50 dark:bg-sky-950/40 text-sky-700/60 dark:text-sky-400/60"
+      }`}
+    >
+      AMEX
     </span>
   );
 }
@@ -112,7 +157,7 @@ export function ExpressCheckoutModal() {
   const [promoCode, setPromoCode] = useState("");
   const [appliedDiscount, setAppliedDiscount] = useState(0);
 
-  // Form Fields
+  // Form Fields & Validation State
   const [email, setEmail] = useState("alex.morgan@example.com");
   const [firstName, setFirstName] = useState("Alex");
   const [lastName, setLastName] = useState("Morgan");
@@ -120,9 +165,11 @@ export function ExpressCheckoutModal() {
   const [city, setCity] = useState("Springfield");
   const [state, setState] = useState("IL");
   const [zip, setZip] = useState("62704");
-  const [cardNumber, setCardNumber] = useState("4242 •••• •••• 4242");
+  const [cardNumber, setCardNumber] = useState("4242 4242 4242 4242");
+  const [cardBrand, setCardBrand] = useState<CardBrand>("visa");
   const [expiry, setExpiry] = useState("08/28");
   const [cvc, setCvc] = useState("888");
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const itemsToBuy = checkoutItems.length > 0 ? checkoutItems : [];
 
@@ -140,19 +187,125 @@ export function ExpressCheckoutModal() {
   const estimatedTax = subtotal * 0.06; // 6% tax estimate
   const total = subtotal > 0 ? subtotal + shippingCost + estimatedTax : 0;
 
+  // Real-time Input Handlers
+  const handleEmailChange = (val: string) => {
+    setEmail(val);
+    if (errors.email) setErrors((prev) => ({ ...prev, email: "" }));
+  };
+
+  const handleFirstNameChange = (val: string) => {
+    setFirstName(val);
+    if (errors.firstName) setErrors((prev) => ({ ...prev, firstName: "" }));
+  };
+
+  const handleLastNameChange = (val: string) => {
+    setLastName(val);
+    if (errors.lastName) setErrors((prev) => ({ ...prev, lastName: "" }));
+  };
+
+  const handleAddressChange = (val: string) => {
+    setAddress(val);
+    if (errors.address) setErrors((prev) => ({ ...prev, address: "" }));
+  };
+
+  const handleCityChange = (val: string) => {
+    setCity(val);
+    if (errors.city) setErrors((prev) => ({ ...prev, city: "" }));
+  };
+
+  const handleStateChange = (val: string) => {
+    const formatted = val.toUpperCase().slice(0, 2);
+    setState(formatted);
+    if (errors.state) setErrors((prev) => ({ ...prev, state: "" }));
+  };
+
+  const handleZipChange = (val: string) => {
+    const formatted = formatZipCode(val);
+    setZip(formatted);
+    if (errors.zip) setErrors((prev) => ({ ...prev, zip: "" }));
+  };
+
+  const handleCardNumberChange = (val: string) => {
+    const formatted = formatCardNumber(val);
+    setCardNumber(formatted);
+    const brand = detectCardBrand(val);
+    setCardBrand(brand);
+    if (errors.cardNumber) setErrors((prev) => ({ ...prev, cardNumber: "" }));
+  };
+
+  const handleExpiryChange = (val: string) => {
+    const formatted = formatExpiry(val);
+    setExpiry(formatted);
+    if (errors.expiry) setErrors((prev) => ({ ...prev, expiry: "" }));
+  };
+
+  const handleCvcChange = (val: string) => {
+    const digits = sanitizeDigits(val).slice(0, 4);
+    setCvc(digits);
+    if (errors.cvc) setErrors((prev) => ({ ...prev, cvc: "" }));
+  };
+
   const handleApplyPromo = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!promoCode.trim()) return;
-    const code = promoCode.trim().toUpperCase();
-    if (code === "HINT10" || code === "SAVE10" || code === "WELCOME") {
+    const promoCheck = validatePromoCode(promoCode);
+    if (!promoCheck.isValid) {
+      toast.error(promoCheck.error || "Please enter a valid coupon code.");
+      return;
+    }
+    const code = promoCheck.sanitizedValue || promoCode.trim().toUpperCase();
+    if (code === "HINT10" || code === "SAVE10" || code === "WELCOME" || code === "HINT15") {
       setAppliedDiscount(10);
       toast.success(`Promo code ${code} applied (10% OFF)!`);
+      setPromoCode(code);
     } else {
-      toast.error("Invalid coupon code. Try 'HINT10'");
+      toast.error("Invalid coupon code. Try 'HINT10' or 'SAVE10'");
     }
   };
 
   const handlePlaceOrder = (expressMethod?: string) => {
+    if (!expressMethod) {
+      // Validate all form fields using regex and rules
+      const newErrors: Record<string, string> = {};
+
+      const emailCheck = validateEmail(email);
+      if (!emailCheck.isValid) newErrors.email = emailCheck.error!;
+
+      const fnCheck = validateName(firstName, "First name");
+      if (!fnCheck.isValid) newErrors.firstName = fnCheck.error!;
+
+      const lnCheck = validateName(lastName, "Last name");
+      if (!lnCheck.isValid) newErrors.lastName = lnCheck.error!;
+
+      const addrCheck = validateAddress(address);
+      if (!addrCheck.isValid) newErrors.address = addrCheck.error!;
+
+      const cityCheck = validateCity(city);
+      if (!cityCheck.isValid) newErrors.city = cityCheck.error!;
+
+      const stateCheck = validateState(state);
+      if (!stateCheck.isValid) newErrors.state = stateCheck.error!;
+
+      const zipCheck = validateZip(zip);
+      if (!zipCheck.isValid) newErrors.zip = zipCheck.error!;
+
+      const cardCheck = validateCardNumber(cardNumber);
+      if (!cardCheck.isValid) newErrors.cardNumber = cardCheck.error!;
+
+      const expiryCheck = validateExpiry(expiry);
+      if (!expiryCheck.isValid) newErrors.expiry = expiryCheck.error!;
+
+      const cvcCheck = validateCvc(cvc, cardBrand);
+      if (!cvcCheck.isValid) newErrors.cvc = cvcCheck.error!;
+
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        const firstError = Object.values(newErrors)[0];
+        toast.error(firstError);
+        return;
+      }
+    }
+
+    setErrors({});
     setIsSubmitting(true);
 
     setTimeout(() => {
@@ -376,7 +529,7 @@ export function ExpressCheckoutModal() {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <Label htmlFor="checkout-email" className="text-xs font-bold uppercase tracking-wider text-foreground">
-                      Contact Information
+                      Contact Information <span className="text-rose-500">*</span>
                     </Label>
                     <span className="text-[11px] text-muted-foreground">Receipt will be sent here</span>
                   </div>
@@ -384,10 +537,17 @@ export function ExpressCheckoutModal() {
                     id="checkout-email"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => handleEmailChange(e.target.value)}
                     placeholder="name@example.com"
-                    className="bg-background border-input"
+                    aria-invalid={!!errors.email}
+                    className={cn(
+                      "bg-background border-input",
+                      errors.email && "border-rose-500 focus-visible:ring-rose-500/20"
+                    )}
                   />
+                  {errors.email && (
+                    <p className="text-[11px] text-rose-500 mt-1 font-medium">{errors.email}</p>
+                  )}
                   <div className="mt-2 flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -409,68 +569,124 @@ export function ExpressCheckoutModal() {
                   <div className="space-y-3">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                       <div className="min-w-0">
-                        <Label htmlFor="first-name" className="text-[11px] text-muted-foreground">First Name</Label>
+                        <Label htmlFor="first-name" className="text-[11px] text-muted-foreground">
+                          First Name <span className="text-rose-500">*</span>
+                        </Label>
                         <Input
                           id="first-name"
                           value={firstName}
-                          onChange={(e) => setFirstName(e.target.value)}
+                          onChange={(e) => handleFirstNameChange(e.target.value)}
                           placeholder="First Name"
-                          className="mt-1 bg-background border-input text-xs sm:text-sm"
+                          aria-invalid={!!errors.firstName}
+                          className={cn(
+                            "mt-1 bg-background border-input text-xs sm:text-sm",
+                            errors.firstName && "border-rose-500 focus-visible:ring-rose-500/20"
+                          )}
                         />
+                        {errors.firstName && (
+                          <p className="text-[11px] text-rose-500 mt-0.5">{errors.firstName}</p>
+                        )}
                       </div>
                       <div className="min-w-0">
-                        <Label htmlFor="last-name" className="text-[11px] text-muted-foreground">Last Name</Label>
+                        <Label htmlFor="last-name" className="text-[11px] text-muted-foreground">
+                          Last Name <span className="text-rose-500">*</span>
+                        </Label>
                         <Input
                           id="last-name"
                           value={lastName}
-                          onChange={(e) => setLastName(e.target.value)}
+                          onChange={(e) => handleLastNameChange(e.target.value)}
                           placeholder="Last Name"
-                          className="mt-1 bg-background border-input text-xs sm:text-sm"
+                          aria-invalid={!!errors.lastName}
+                          className={cn(
+                            "mt-1 bg-background border-input text-xs sm:text-sm",
+                            errors.lastName && "border-rose-500 focus-visible:ring-rose-500/20"
+                          )}
                         />
+                        {errors.lastName && (
+                          <p className="text-[11px] text-rose-500 mt-0.5">{errors.lastName}</p>
+                        )}
                       </div>
                     </div>
 
                     <div className="min-w-0">
-                      <Label htmlFor="address-line" className="text-[11px] text-muted-foreground">Street Address</Label>
+                      <Label htmlFor="address-line" className="text-[11px] text-muted-foreground">
+                        Street Address <span className="text-rose-500">*</span>
+                      </Label>
                       <Input
                         id="address-line"
                         value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                        placeholder="Street Address"
-                        className="mt-1 bg-background border-input text-xs sm:text-sm"
+                        onChange={(e) => handleAddressChange(e.target.value)}
+                        placeholder="Street Address (e.g. 742 Evergreen Terrace)"
+                        aria-invalid={!!errors.address}
+                        className={cn(
+                          "mt-1 bg-background border-input text-xs sm:text-sm",
+                          errors.address && "border-rose-500 focus-visible:ring-rose-500/20"
+                        )}
                       />
+                      {errors.address && (
+                        <p className="text-[11px] text-rose-500 mt-0.5">{errors.address}</p>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
                       <div className="min-w-0">
-                        <Label htmlFor="city-input" className="text-[11px] text-muted-foreground">City</Label>
+                        <Label htmlFor="city-input" className="text-[11px] text-muted-foreground">
+                          City <span className="text-rose-500">*</span>
+                        </Label>
                         <Input
                           id="city-input"
                           value={city}
-                          onChange={(e) => setCity(e.target.value)}
+                          onChange={(e) => handleCityChange(e.target.value)}
                           placeholder="City"
-                          className="mt-1 bg-background border-input text-xs sm:text-sm px-2 sm:px-2.5"
+                          aria-invalid={!!errors.city}
+                          className={cn(
+                            "mt-1 bg-background border-input text-xs sm:text-sm px-2 sm:px-2.5",
+                            errors.city && "border-rose-500 focus-visible:ring-rose-500/20"
+                          )}
                         />
+                        {errors.city && (
+                          <p className="text-[10px] text-rose-500 mt-0.5 truncate">{errors.city}</p>
+                        )}
                       </div>
                       <div className="min-w-0">
-                        <Label htmlFor="state-input" className="text-[11px] text-muted-foreground">State</Label>
+                        <Label htmlFor="state-input" className="text-[11px] text-muted-foreground">
+                          State <span className="text-rose-500">*</span>
+                        </Label>
                         <Input
                           id="state-input"
                           value={state}
-                          onChange={(e) => setState(e.target.value)}
-                          placeholder="State"
-                          className="mt-1 bg-background border-input text-xs sm:text-sm px-2 sm:px-2.5"
+                          onChange={(e) => handleStateChange(e.target.value)}
+                          placeholder="IL"
+                          maxLength={2}
+                          aria-invalid={!!errors.state}
+                          className={cn(
+                            "mt-1 bg-background border-input text-xs sm:text-sm px-2 sm:px-2.5 uppercase font-medium",
+                            errors.state && "border-rose-500 focus-visible:ring-rose-500/20"
+                          )}
                         />
+                        {errors.state && (
+                          <p className="text-[10px] text-rose-500 mt-0.5 truncate">{errors.state}</p>
+                        )}
                       </div>
                       <div className="min-w-0">
-                        <Label htmlFor="zip-input" className="text-[11px] text-muted-foreground">ZIP</Label>
+                        <Label htmlFor="zip-input" className="text-[11px] text-muted-foreground">
+                          ZIP <span className="text-rose-500">*</span>
+                        </Label>
                         <Input
                           id="zip-input"
                           value={zip}
-                          onChange={(e) => setZip(e.target.value)}
-                          placeholder="ZIP"
-                          className="mt-1 bg-background border-input text-xs sm:text-sm px-2 sm:px-2.5"
+                          onChange={(e) => handleZipChange(e.target.value)}
+                          placeholder="62704"
+                          maxLength={10}
+                          aria-invalid={!!errors.zip}
+                          className={cn(
+                            "mt-1 bg-background border-input text-xs sm:text-sm px-2 sm:px-2.5 font-mono",
+                            errors.zip && "border-rose-500 focus-visible:ring-rose-500/20"
+                          )}
                         />
+                        {errors.zip && (
+                          <p className="text-[10px] text-rose-500 mt-0.5 truncate">{errors.zip}</p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -541,49 +757,79 @@ export function ExpressCheckoutModal() {
                       Payment Details
                     </h3>
                     <div className="flex items-center gap-1.5">
-                      <VisaBadge />
-                      <MastercardBadge />
+                      <VisaBadge active={cardBrand === "visa"} />
+                      <MastercardBadge active={cardBrand === "mastercard"} />
+                      <AmexBadge active={cardBrand === "amex"} />
                     </div>
                   </div>
 
                   <Card className="border-border bg-muted/40 p-4 space-y-3 gap-3">
                     <div>
-                      <Label htmlFor="checkout-card-number" className="text-[11px] text-muted-foreground">
-                        Card Number
-                      </Label>
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="checkout-card-number" className="text-[11px] text-muted-foreground">
+                          Card Number <span className="text-rose-500">*</span>
+                        </Label>
+                        <span className="text-[10px] text-muted-foreground uppercase font-mono">
+                          {cardBrand !== "unknown" ? cardBrand : "Card"}
+                        </span>
+                      </div>
                       <Input
                         id="checkout-card-number"
                         value={cardNumber}
-                        onChange={(e) => setCardNumber(e.target.value)}
-                        placeholder="•••• •••• •••• ••••"
-                        className="mt-1 bg-background font-mono text-sm border-input"
+                        onChange={(e) => handleCardNumberChange(e.target.value)}
+                        placeholder="4242 4242 4242 4242"
+                        maxLength={19}
+                        aria-invalid={!!errors.cardNumber}
+                        className={cn(
+                          "mt-1 bg-background font-mono text-sm border-input",
+                          errors.cardNumber && "border-rose-500 focus-visible:ring-rose-500/20"
+                        )}
                       />
+                      {errors.cardNumber && (
+                        <p className="text-[11px] text-rose-500 mt-1">{errors.cardNumber}</p>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
                       <div className="min-w-0">
                         <Label htmlFor="checkout-card-expiry" className="text-[11px] text-muted-foreground">
-                          Expiration (MM/YY)
+                          Expiration (MM/YY) <span className="text-rose-500">*</span>
                         </Label>
                         <Input
                           id="checkout-card-expiry"
                           value={expiry}
-                          onChange={(e) => setExpiry(e.target.value)}
+                          onChange={(e) => handleExpiryChange(e.target.value)}
                           placeholder="MM/YY"
-                          className="mt-1 bg-background font-mono text-sm border-input"
+                          maxLength={5}
+                          aria-invalid={!!errors.expiry}
+                          className={cn(
+                            "mt-1 bg-background font-mono text-sm border-input",
+                            errors.expiry && "border-rose-500 focus-visible:ring-rose-500/20"
+                          )}
                         />
+                        {errors.expiry && (
+                          <p className="text-[11px] text-rose-500 mt-1">{errors.expiry}</p>
+                        )}
                       </div>
                       <div className="min-w-0">
                         <Label htmlFor="checkout-card-cvc" className="text-[11px] text-muted-foreground">
-                          Security CVC
+                          Security CVC <span className="text-rose-500">*</span>
                         </Label>
                         <Input
                           id="checkout-card-cvc"
                           value={cvc}
-                          onChange={(e) => setCvc(e.target.value)}
+                          onChange={(e) => handleCvcChange(e.target.value)}
                           placeholder="123"
-                          className="mt-1 bg-background font-mono text-sm border-input"
+                          maxLength={4}
+                          aria-invalid={!!errors.cvc}
+                          className={cn(
+                            "mt-1 bg-background font-mono text-sm border-input",
+                            errors.cvc && "border-rose-500 focus-visible:ring-rose-500/20"
+                          )}
                         />
+                        {errors.cvc && (
+                          <p className="text-[11px] text-rose-500 mt-1">{errors.cvc}</p>
+                        )}
                       </div>
                     </div>
                   </Card>

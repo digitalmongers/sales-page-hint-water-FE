@@ -31,6 +31,12 @@ import {
   StarIcon,
   CheckmarkCircle02Icon,
 } from "@hugeicons/core-free-icons";
+import {
+  validateEmail,
+  validateComment,
+  sanitizeText,
+  sanitizeEmail,
+} from "@/lib/validation";
 
 export interface Review {
   id: number;
@@ -205,14 +211,29 @@ export function ReviewSection({
   const handleSubmitReview = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!formEmail.trim() || !formComment.trim()) {
-      toast.error("Please fill in all required fields.");
+    const emailCheck = validateEmail(formEmail);
+    if (!emailCheck.isValid) {
+      toast.error(emailCheck.error || "Please provide a valid email address.");
+      return;
+    }
+
+    const commentCheck = validateComment(formComment, 10, 800);
+    if (!commentCheck.isValid) {
+      toast.error(commentCheck.error || "Please write a review with at least 10 characters.");
+      return;
+    }
+
+    if (formRating < 1 || formRating > 5) {
+      toast.error("Please select a rating between 1 and 5 stars.");
       return;
     }
 
     setIsSubmitting(true);
 
-    const emailUsername = formEmail.split("@")[0].replace(/[._-]+/g, " ").trim();
+    const cleanEmail = emailCheck.sanitizedValue!;
+    const cleanComment = commentCheck.sanitizedValue!;
+
+    const emailUsername = cleanEmail.split("@")[0].replace(/[._-]+/g, " ").trim();
     const displayName = emailUsername
       ? emailUsername
           .split(" ")
@@ -228,10 +249,10 @@ export function ReviewSection({
 
     const newReview: Review = {
       id: Date.now(),
-      name: displayName,
+      name: sanitizeText(displayName),
       initials,
       rating: formRating,
-      comment: formComment.trim(),
+      comment: cleanComment,
       date: new Intl.DateTimeFormat("en-US", {
         month: "long",
         day: "numeric",
