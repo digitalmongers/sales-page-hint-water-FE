@@ -25,6 +25,8 @@ const fontMono = Geist_Mono({
   variable: "--font-mono",
 });
 
+const siteUrl = "https://hint-water-fe.vercel.app/";
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -36,7 +38,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://hintwater.com"),
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Hint® Water | Pure Crisp Fruit-Infused Water with 0 Sugar & 0 Calories",
     template: "%s | Hint® Water",
@@ -71,16 +73,16 @@ export const metadata: Metadata = {
     title: "Hint® Water | Pure Crisp Fruit-Infused Water with 0 Sugar & 0 Calories",
     description:
       "Delicious purified water infused with real fruit essences. No sugar, no diet sweeteners, no preservatives, and 0 calories. Discover our signature flavors today!",
-    url: "https://hintwater.com",
+    url: "https://hint-water-fe.vercel.app/",
     siteName: "Hint Water",
     locale: "en_US",
     type: "website",
     images: [
       {
-        url: "/images/peachRaspberry.svg",
+        url: "/images/blackberry-nobg.png",
         width: 1200,
         height: 630,
-        alt: "Hint® Peach Raspberry Fruit Infused Water Bottle",
+        alt: "Hint® Blackberry Fruit Infused Water Bottle",
       },
       {
         url: "/images/watermelon.webp",
@@ -96,7 +98,7 @@ export const metadata: Metadata = {
     description:
       "0 Sugar, 0 Diet Sweeteners, 0 Calories. Crisp pure water infused with natural fruit essences.",
     creator: "@hintwater",
-    images: ["/images/peachRaspberry.svg"],
+    images: ["/images/blackberry-nobg.png"],
   },
   robots: {
     index: true,
